@@ -21,7 +21,7 @@
 
 .btn-add {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   color: white;
   padding: 0.3rem 0.9rem;
   border-radius: 6px;
@@ -32,7 +32,7 @@
 }
 
 .btn-add:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   border-color: white;
 }
 
@@ -64,6 +64,7 @@
   align-items: center;
   gap: 0.5rem;
   min-width: 110px;
+  flex-shrink: 0;
 }
 
 .equipo-icon {
@@ -80,9 +81,17 @@
   color: white;
 }
 
-.equipo-icon.xbox { background: #107c10; }
-.equipo-icon.pc { background: #1565c0; }
-.equipo-icon.playstation { background: #003791; }
+.equipo-icon.xbox {
+  background: #107c10;
+}
+
+.equipo-icon.pc {
+  background: #1565c0;
+}
+
+.equipo-icon.playstation {
+  background: #003791;
+}
 
 .equipo-nombre {
   font-weight: 600;
@@ -90,7 +99,7 @@
   white-space: nowrap;
 }
 
-/* Botones de acción idle */
+/* Botones de acción */
 .btn-accion {
   padding: 0.35rem 0.75rem;
   border: none;
@@ -100,6 +109,7 @@
   cursor: pointer;
   transition: transform 0.15s, opacity 0.15s;
   color: white;
+  white-space: nowrap;
 }
 
 .btn-accion:hover {
@@ -119,18 +129,18 @@
   background-color: var(--pink-dark);
 }
 
-/* Estado activo: tiempo definido */
+/* Zona de tiempo + barra de progreso */
 .tiempo-info {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  flex: 1;
-  min-width: 180px;
+  flex: 1 1 180px;
+  min-width: 160px;
 }
 
 .progress-wrap {
   flex: 1;
-  height: 28px;
+  height: 32px;
   background: #2a2a2a;
   border-radius: 6px;
   overflow: hidden;
@@ -152,30 +162,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   pointer-events: none;
-}
-
-/* Estado libre */
-.libre-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  flex: 1;
-  min-width: 160px;
-  font-size: 0.82rem;
-}
-
-.libre-info span {
-  opacity: 0.9;
+  padding: 0 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .acciones-activas {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .btn-cobrar {
@@ -240,12 +241,16 @@
   animation: fadeIn 0.2s ease;
 }
 
+.price-panel[hidden] {
+  display: none !important;
+}
+
 .price-panel-inner {
   background: #1e1e1e;
   border: 1px solid #333;
   border-radius: 12px;
   padding: 0.9rem 1rem;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -310,7 +315,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -328,7 +333,7 @@
   padding: 1.4rem 1.6rem;
   min-width: 260px;
   max-width: 90vw;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -349,7 +354,7 @@
   gap: 0.5rem;
 }
 
-.modal-body-row {
+.modal-body.modal-body-row {
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -366,8 +371,8 @@
   width: 100%;
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.25);
   color: white;
   font-size: 0.95rem;
 }
@@ -375,7 +380,7 @@
 .modal-input:focus,
 .modal-select:focus {
   outline: none;
-  border-color: rgba(255,255,255,0.6);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .modal-input-num {
@@ -390,8 +395,8 @@
 
 .modal-btn {
   padding: 0.55rem 1.8rem;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 8px;
   color: white;
   font-size: 0.95rem;
@@ -401,7 +406,7 @@
 }
 
 .modal-btn:hover {
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .modal-actions {
@@ -410,8 +415,8 @@
 }
 
 .modal-btn-cancel {
-  background: rgba(198,40,40,0.5);
-  border-color: rgba(255,255,255,0.3);
+  background: rgba(198, 40, 40, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .cobrar-info {
@@ -435,20 +440,35 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .equipo-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .tiempo-info {
+    width: 100%;
+    min-width: 0;
   }
 
   .acciones-activas {
@@ -463,5 +483,9 @@
 
   .price-panel-inner {
     min-width: unset;
+  }
+
+  .progress-text {
+    font-size: 0.7rem;
   }
 }

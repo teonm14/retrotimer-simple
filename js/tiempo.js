@@ -121,16 +121,21 @@ document.addEventListener('DOMContentLoaded', () => {
       // ---- Estado LIBRE (cronómetro + límite) ----
       if (eq.estado === 'libre') {
         const transcurrido = eq.tiempoTranscurrido || 0;
-        const limiteRestante = Math.max(0, (eq.limiteTotal || 0) - transcurrido);
+        const limiteTotal = eq.limiteTotal || 0;
+        const limiteRestante = Math.max(0, limiteTotal - transcurrido);
+        // Barra basada en el límite restante (si hay límite). Si límite = 0, barra llena.
+        const pct = limiteTotal > 0 ? (limiteRestante / limiteTotal) * 100 : 100;
         return `
           <div class="equipo-row" data-id="${eq.id}">
             <div class="equipo-info">
               <div class="equipo-icon ${iconC}">${iconL}</div>
               <span class="equipo-nombre">${eq.nombre}</span>
             </div>
-            <div class="libre-info">
-              <span>Tiempo transcurrido: ${formatTime(transcurrido)}</span>
-              <span>Límite Restante: ${formatTime(limiteRestante)}</span>
+            <div class="tiempo-info">
+              <div class="progress-wrap">
+                <div class="progress-bar" style="width:${pct}%"></div>
+                <span class="progress-text">Transcurrido: ${formatTime(transcurrido)} · Límite: ${formatTime(limiteRestante)}</span>
+              </div>
             </div>
             <div class="acciones-activas">
               <button class="btn-accion btn-restar" data-action="restar">Restar Tiempo</button>

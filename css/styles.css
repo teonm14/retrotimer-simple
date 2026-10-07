@@ -90,7 +90,7 @@
 }
 
 body {
-  font-family: 'MonsterratAlternatives', system-ui, -apple-system, sans-serif;
+  font-family: 'MontserratAlternatives', system-ui, -apple-system, sans-serif;
   background-color: var(--content-bg);
   color: var(--text-color);
   min-height: 100vh;
