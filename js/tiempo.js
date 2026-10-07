@@ -1,33 +1,45 @@
 /**
- * RetroControl - Gestor de Tiempo (completo)
+ * RetroControl - Gestor de Tiempo
+ * Con pausa, notas, extra en cobro e historial
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   // ---------- Estado ----------
   let equipos = JSON.parse(localStorage.getItem('rc_equipos') || '[]');
   let priceConfig = JSON.parse(localStorage.getItem('rc_price') || '{"amount":30,"per":30,"unit":"minutos"}');
+  let historial = JSON.parse(localStorage.getItem('rc_historial') || '[]');
 
-  // Referencias DOM
+  // Migrar equipos antiguos
+  equipos.forEach(eq => {
+    if (!eq.estado) eq.estado = 'idle';
+    if (eq.notas === undefined) eq.notas = '';
+    if (eq.pausado === undefined) eq.pausado = false;
+  });
+
+  // DOM
   const equiposList = document.getElementById('equiposList');
+  const historialList = document.getElementById('historialList');
   const btnAdd = document.getElementById('btnAddEquipo');
   const fabConfig = document.getElementById('fabConfig');
   const pricePanel = document.getElementById('pricePanel');
+  const btnClearHistorial = document.getElementById('btnClearHistorial');
 
-  // Modales
   const modalNuevo = document.getElementById('modalNuevoEquipo');
   const modalTiempo = document.getElementById('modalTiempo');
+  const modalNotas = document.getElementById('modalNotas');
   const modalCobrar = document.getElementById('modalCobrar');
   const modalConfirm = document.getElementById('modalConfirm');
 
-  // Contexto temporal para modales
   let currentEquipoId = null;
-  let currentTiempoAction = null; // 'definido' | 'agregar' | 'limite' | 'restar'
+  let currentTiempoAction = null;
   let confirmCallback = null;
+  let cobrarContext = null; // { id, segundos, base }
 
   // ---------- Helpers ----------
   function save() {
     localStorage.setItem('rc_equipos', JSON.stringify(equipos));
     localStorage.setItem('rc_price', JSON.stringify(priceConfig));
+    localStorage.setItem('rc_historial', JSON.stringify(historial));
   }
 
   function formatTime(seconds) {
@@ -57,17 +69,52 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'PC';
   }
 
-  /** Calcula el precio según el tiempo en segundos y la config actual */
   function calcularPrecio(segundos) {
     const { amount, per, unit } = priceConfig;
     const perSec = unit === 'horas' ? (per * 3600) : (per * 60);
     if (perSec <= 0) return 0;
-    // Cobramos por bloques completos + proporción del último
     const bloques = segundos / perSec;
-    return Math.ceil(bloques * amount * 100) / 100; // redondeo a 2 decimales hacia arriba
+    return Math.ceil(bloques * amount * 100) / 100;
   }
 
-  // ---------- Render ----------
+  function formatFecha(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString('es-MX', {
+      day: '2-digit', month: '2-digit', year: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  // ---------- Render Historial ----------
+  function renderHistorial() {
+    if (!historialList) return;
+    if (historial.length === 0) {
+      historialList.innerHTML = '<p class="historial-empty">Sin registros aún</p>';
+      return;
+    }
+    // Más recientes primero
+    const items = [...historial].reverse();
+    historialList.innerHTML = items.map(h => `
+      <div class="historial-item">
+        <div class="historial-item-top">
+          <span class="historial-equipo">${h.nombre}</span>
+          <span class="historial-tipo">${h.tipo}</span>
+        </div>
+        <div class="historial-item-mid">
+          <span>${h.modo === 'definido' ? 'Definido' : 'Libre'}</span>
+          <span>${formatTime(h.segundos)}</span>
+        </div>
+        <div class="historial-item-bot">
+          <span class="historial-total">$${Number(h.total).toFixed(2)}</span>
+          <span class="historial-fecha">${formatFecha(h.fecha)}</span>
+        </div>
+        ${h.notas ? `<div class="historial-notas">${h.notas}</div>` : ''}
+        ${h.extra > 0 ? `<div class="historial-extra">Extra: $${Number(h.extra).toFixed(2)}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // ---------- Render Equipos ----------
   function render() {
     if (!equiposList) return;
 
@@ -79,30 +126,41 @@ document.addEventListener('DOMContentLoaded', () => {
     equiposList.innerHTML = equipos.map(eq => {
       const iconC = iconClass(eq.tipo);
       const iconL = iconLabel(eq.tipo);
+      const notasBtn = `
+        <button class="btn-icon btn-notas" data-action="notas" title="Notas">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </button>`;
 
-      // ---- Estado IDLE ----
+      // ---- IDLE ----
       if (eq.estado === 'idle') {
         return `
           <div class="equipo-row" data-id="${eq.id}">
             <div class="equipo-info">
               <div class="equipo-icon ${iconC}">${iconL}</div>
               <span class="equipo-nombre">${eq.nombre}</span>
+              ${eq.notas ? '<ion-icon name="document-text" class="notas-indicator" title="Tiene notas"></ion-icon>' : ''}
             </div>
             <button class="btn-accion btn-definido" data-action="definido">Tiempo Definido</button>
             <button class="btn-accion btn-libre" data-action="libre">Tiempo Libre</button>
-            <button class="btn-accion btn-eliminar" data-action="eliminar">Eliminar</button>
+            ${notasBtn}
+            <button class="btn-accion btn-eliminar" data-action="eliminar">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
           </div>`;
       }
 
-      // ---- Estado DEFINIDO (temporizador) ----
+      // ---- DEFINIDO ----
       if (eq.estado === 'definido') {
         const restante = Math.max(0, eq.tiempoTotal - eq.tiempoTranscurrido);
         const pct = eq.tiempoTotal > 0 ? (restante / eq.tiempoTotal) * 100 : 0;
+        const pauseIcon = eq.pausado ? 'play' : 'pause';
+        const pauseTitle = eq.pausado ? 'Reanudar' : 'Pausar';
         return `
-          <div class="equipo-row" data-id="${eq.id}">
+          <div class="equipo-row ${eq.pausado ? 'is-paused' : ''}" data-id="${eq.id}">
             <div class="equipo-info">
               <div class="equipo-icon ${iconC}">${iconL}</div>
               <span class="equipo-nombre">${eq.nombre}</span>
+              ${eq.pausado ? '<span class="badge-paused">PAUSA</span>' : ''}
             </div>
             <div class="tiempo-info">
               <div class="progress-wrap">
@@ -111,36 +169,50 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             </div>
             <div class="acciones-activas">
+              <button class="btn-accion btn-pause" data-action="pause" title="${pauseTitle}">
+                <ion-icon name="${pauseIcon}-outline"></ion-icon>
+              </button>
               <button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>
-              <button class="btn-accion btn-agregar" data-action="agregar">Agregar Tiempo</button>
-              <button class="btn-accion btn-cancelar" data-action="cancelar">Cancelar</button>
+              <button class="btn-accion btn-agregar" data-action="agregar">+ Tiempo</button>
+              ${notasBtn}
+              <button class="btn-accion btn-cancelar" data-action="cancelar">
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
             </div>
           </div>`;
       }
 
-      // ---- Estado LIBRE (cronómetro + límite) ----
+      // ---- LIBRE ----
       if (eq.estado === 'libre') {
         const transcurrido = eq.tiempoTranscurrido || 0;
         const limiteTotal = eq.limiteTotal || 0;
         const limiteRestante = Math.max(0, limiteTotal - transcurrido);
-        // Barra basada en el límite restante (si hay límite). Si límite = 0, barra llena.
         const pct = limiteTotal > 0 ? (limiteRestante / limiteTotal) * 100 : 100;
+        const pauseIcon = eq.pausado ? 'play' : 'pause';
+        const pauseTitle = eq.pausado ? 'Reanudar' : 'Pausar';
         return `
-          <div class="equipo-row" data-id="${eq.id}">
+          <div class="equipo-row ${eq.pausado ? 'is-paused' : ''}" data-id="${eq.id}">
             <div class="equipo-info">
               <div class="equipo-icon ${iconC}">${iconL}</div>
               <span class="equipo-nombre">${eq.nombre}</span>
+              ${eq.pausado ? '<span class="badge-paused">PAUSA</span>' : ''}
             </div>
             <div class="tiempo-info">
               <div class="progress-wrap">
                 <div class="progress-bar" style="width:${pct}%"></div>
-                <span class="progress-text">Transcurrido: ${formatTime(transcurrido)} · Límite: ${formatTime(limiteRestante)}</span>
+                <span class="progress-text">${formatTime(transcurrido)} / Límite ${formatTime(limiteRestante)}</span>
               </div>
             </div>
             <div class="acciones-activas">
-              <button class="btn-accion btn-restar" data-action="restar">Restar Tiempo</button>
+              <button class="btn-accion btn-pause" data-action="pause" title="${pauseTitle}">
+                <ion-icon name="${pauseIcon}-outline"></ion-icon>
+              </button>
+              <button class="btn-accion btn-restar" data-action="restar">− Tiempo</button>
               <button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>
-              <button class="btn-accion btn-cancelar" data-action="cancelar">Cancelar</button>
+              ${notasBtn}
+              <button class="btn-accion btn-cancelar" data-action="cancelar">
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
             </div>
           </div>`;
       }
@@ -149,25 +221,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
   }
 
-  // ---------- Tick (cada segundo) ----------
+  // ---------- Tick ----------
   function tick() {
     let changed = false;
     const now = Date.now();
 
     equipos.forEach(eq => {
-      if (eq.estado === 'definido' && eq.startTimestamp) {
+      if (eq.pausado || !eq.startTimestamp) return;
+
+      if (eq.estado === 'definido') {
         const elapsed = Math.floor((now - eq.startTimestamp) / 1000) + (eq.pausedAccum || 0);
         if (elapsed !== eq.tiempoTranscurrido) {
-          eq.tiempoTranscurrido = elapsed;
+          eq.tiempoTranscurrido = Math.min(elapsed, eq.tiempoTotal);
           changed = true;
-          // Si se acabó el tiempo, se queda en 0 (no auto-cobra)
-          if (eq.tiempoTranscurrido >= eq.tiempoTotal) {
-            eq.tiempoTranscurrido = eq.tiempoTotal;
-          }
         }
       }
 
-      if (eq.estado === 'libre' && eq.startTimestamp) {
+      if (eq.estado === 'libre') {
         const elapsed = Math.floor((now - eq.startTimestamp) / 1000) + (eq.pausedAccum || 0);
         if (elapsed !== eq.tiempoTranscurrido) {
           eq.tiempoTranscurrido = elapsed;
@@ -184,15 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(tick, 1000);
 
-  // ---------- Abrir / Cerrar modales ----------
-  function openModal(el) {
-    el.hidden = false;
-  }
-  function closeModal(el) {
-    el.hidden = true;
-  }
+  // ---------- Modales helpers ----------
+  function openModal(el) { el.hidden = false; }
+  function closeModal(el) { el.hidden = true; }
 
-  // Cerrar al hacer click fuera del modal
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeModal(overlay);
@@ -223,14 +288,16 @@ document.addEventListener('DOMContentLoaded', () => {
       tiempoTranscurrido: 0,
       limiteTotal: 0,
       startTimestamp: null,
-      pausedAccum: 0
+      pausedAccum: 0,
+      pausado: false,
+      notas: ''
     });
     save();
     render();
     closeModal(modalNuevo);
   });
 
-  // ---------- Click en acciones de fila ----------
+  // ---------- Acciones de fila ----------
   equiposList.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -275,6 +342,34 @@ document.addEventListener('DOMContentLoaded', () => {
       openModal(modalTiempo);
     }
 
+    if (action === 'pause') {
+      if (eq.pausado) {
+        // Reanudar
+        eq.pausado = false;
+        eq.startTimestamp = Date.now();
+      } else {
+        // Pausar: congelar el acumulado
+        if (eq.startTimestamp) {
+          const now = Date.now();
+          eq.pausedAccum = Math.floor((now - eq.startTimestamp) / 1000) + (eq.pausedAccum || 0);
+          if (eq.estado === 'definido') {
+            eq.pausedAccum = Math.min(eq.pausedAccum, eq.tiempoTotal);
+          }
+          eq.tiempoTranscurrido = eq.pausedAccum;
+        }
+        eq.startTimestamp = null;
+        eq.pausado = true;
+      }
+      save();
+      render();
+    }
+
+    if (action === 'notas') {
+      document.getElementById('inputNotas').value = eq.notas || '';
+      openModal(modalNotas);
+      setTimeout(() => document.getElementById('inputNotas').focus(), 50);
+    }
+
     if (action === 'eliminar') {
       confirmCallback = () => {
         equipos = equipos.filter(x => x.id !== id);
@@ -282,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
         render();
       };
       document.getElementById('confirmTitle').textContent = '¿Eliminar equipo?';
-      document.getElementById('confirmText').textContent = `Se eliminará "${eq.nombre}". Esta acción no se puede deshacer.`;
+      document.getElementById('confirmText').textContent = `Se eliminará "${eq.nombre}".`;
       openModal(modalConfirm);
     }
 
@@ -294,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eq.limiteTotal = 0;
         eq.startTimestamp = null;
         eq.pausedAccum = 0;
+        eq.pausado = false;
         save();
         render();
       };
@@ -303,34 +399,80 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (action === 'cobrar') {
-      let segundosUsados = 0;
-      if (eq.estado === 'definido') {
-        // En modo definido cobramos el tiempo configurado (o el transcurrido si prefieres)
-        segundosUsados = eq.tiempoTotal; // o eq.tiempoTranscurrido si quieres solo lo usado
-      } else if (eq.estado === 'libre') {
-        segundosUsados = eq.tiempoTranscurrido || 0;
+      // Tiempo utilizado = lo que realmente corrió
+      let segundosUsados = eq.tiempoTranscurrido || 0;
+      if (eq.estado === 'definido' && !eq.pausado && eq.startTimestamp) {
+        // Asegurar valor fresco
+        const now = Date.now();
+        segundosUsados = Math.min(
+          Math.floor((now - eq.startTimestamp) / 1000) + (eq.pausedAccum || 0),
+          eq.tiempoTotal
+        );
       }
-      const total = calcularPrecio(segundosUsados);
-      document.getElementById('cobrarInfo').textContent = `Tiempo utilizado: ${formatTime(segundosUsados)}`;
-      document.getElementById('cobrarTotal').textContent = `Total a cobrar: $${total.toFixed(2)}`;
-      openModal(modalCobrar);
+      if (eq.estado === 'libre' && !eq.pausado && eq.startTimestamp) {
+        const now = Date.now();
+        segundosUsados = Math.floor((now - eq.startTimestamp) / 1000) + (eq.pausedAccum || 0);
+      }
 
-      // Al cerrar el cobrar, volvemos a idle (se considera cobrado)
-      document.getElementById('btnCerrarCobrar').onclick = () => {
-        closeModal(modalCobrar);
-        eq.estado = 'idle';
-        eq.tiempoTotal = 0;
-        eq.tiempoTranscurrido = 0;
-        eq.limiteTotal = 0;
-        eq.startTimestamp = null;
-        eq.pausedAccum = 0;
-        save();
-        render();
-      };
+      const base = calcularPrecio(segundosUsados);
+      cobrarContext = { id, segundos: segundosUsados, base, modo: eq.estado, nombre: eq.nombre, tipo: eq.tipo, notas: eq.notas || '' };
+
+      document.getElementById('cobrarInfo').textContent = `Tiempo utilizado: ${formatTime(segundosUsados)}`;
+      document.getElementById('cobrarBase').textContent = `Tiempo: $${base.toFixed(2)}`;
+      document.getElementById('inputExtra').value = '0';
+      updateCobrarTotal();
+      openModal(modalCobrar);
     }
   });
 
-  // ---------- Aceptar modal de tiempo ----------
+  function updateCobrarTotal() {
+    if (!cobrarContext) return;
+    const extra = Number(document.getElementById('inputExtra').value) || 0;
+    const total = cobrarContext.base + extra;
+    document.getElementById('cobrarTotal').textContent = `Total a cobrar: $${total.toFixed(2)}`;
+  }
+
+  document.getElementById('inputExtra').addEventListener('input', updateCobrarTotal);
+
+  document.getElementById('btnConfirmarCobrar').addEventListener('click', () => {
+    if (!cobrarContext) return;
+    const extra = Number(document.getElementById('inputExtra').value) || 0;
+    const total = cobrarContext.base + extra;
+
+    // Guardar en historial
+    historial.push({
+      id: Date.now(),
+      nombre: cobrarContext.nombre,
+      tipo: cobrarContext.tipo,
+      modo: cobrarContext.modo,
+      segundos: cobrarContext.segundos,
+      base: cobrarContext.base,
+      extra,
+      total,
+      notas: cobrarContext.notas,
+      fecha: Date.now()
+    });
+
+    // Reset equipo
+    const eq = equipos.find(x => x.id === cobrarContext.id);
+    if (eq) {
+      eq.estado = 'idle';
+      eq.tiempoTotal = 0;
+      eq.tiempoTranscurrido = 0;
+      eq.limiteTotal = 0;
+      eq.startTimestamp = null;
+      eq.pausedAccum = 0;
+      eq.pausado = false;
+    }
+
+    cobrarContext = null;
+    save();
+    render();
+    renderHistorial();
+    closeModal(modalCobrar);
+  });
+
+  // ---------- Modal tiempo ----------
   document.getElementById('btnAceptarTiempo').addEventListener('click', () => {
     const valor = document.getElementById('inputTiempoValor').value;
     const unidad = document.getElementById('inputTiempoUnidad').value;
@@ -345,33 +487,29 @@ document.addEventListener('DOMContentLoaded', () => {
       eq.tiempoTranscurrido = 0;
       eq.startTimestamp = Date.now();
       eq.pausedAccum = 0;
+      eq.pausado = false;
     }
 
     if (currentTiempoAction === 'agregar') {
       if (segs <= 0) return;
-      // Sumar al total restante
       const restanteActual = Math.max(0, eq.tiempoTotal - eq.tiempoTranscurrido);
-      // Re-ajustamos: el nuevo total = transcurrido + (restante + agregado)
       eq.tiempoTotal = eq.tiempoTranscurrido + restanteActual + segs;
-      // No tocamos startTimestamp para que el contador siga fluido
     }
 
     if (currentTiempoAction === 'limite') {
-      // Puede ser 0 (sin límite real, solo cronómetro)
       eq.estado = 'libre';
       eq.limiteTotal = segs;
       eq.tiempoTranscurrido = 0;
       eq.startTimestamp = Date.now();
       eq.pausedAccum = 0;
+      eq.pausado = false;
     }
 
     if (currentTiempoAction === 'restar') {
       if (segs <= 0) return;
-      // Restar solo del tiempo transcurrido (cronómetro)
       eq.tiempoTranscurrido = Math.max(0, (eq.tiempoTranscurrido || 0) - segs);
-      // Ajustar el timestamp para que el tick no lo vuelva a sumar de golpe
-      if (eq.startTimestamp) {
-        eq.pausedAccum = eq.tiempoTranscurrido;
+      eq.pausedAccum = eq.tiempoTranscurrido;
+      if (!eq.pausado) {
         eq.startTimestamp = Date.now();
       }
     }
@@ -381,7 +519,18 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModal(modalTiempo);
   });
 
-  // ---------- Confirmación ----------
+  // ---------- Notas ----------
+  document.getElementById('btnGuardarNotas').addEventListener('click', () => {
+    const eq = equipos.find(x => x.id === currentEquipoId);
+    if (eq) {
+      eq.notas = document.getElementById('inputNotas').value.trim();
+      save();
+      render();
+    }
+    closeModal(modalNotas);
+  });
+
+  // ---------- Confirm ----------
   document.getElementById('btnConfirmSi').addEventListener('click', () => {
     if (typeof confirmCallback === 'function') confirmCallback();
     confirmCallback = null;
@@ -392,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModal(modalConfirm);
   });
 
-  // ---------- Panel de precios ----------
+  // ---------- Precio ----------
   function loadPriceUI() {
     document.getElementById('priceAmount').value = priceConfig.amount;
     document.getElementById('pricePer').value = priceConfig.per;
@@ -400,8 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   fabConfig.addEventListener('click', () => {
-    const isHidden = pricePanel.hidden;
-    if (isHidden) {
+    if (pricePanel.hidden) {
       loadPriceUI();
       pricePanel.hidden = false;
     } else {
@@ -419,19 +567,25 @@ document.addEventListener('DOMContentLoaded', () => {
     pricePanel.hidden = true;
   });
 
-  // Cerrar panel al hacer click fuera
   document.addEventListener('click', (e) => {
-    if (!pricePanel.hidden &&
-        !pricePanel.contains(e.target) &&
-        e.target !== fabConfig) {
+    if (!pricePanel.hidden && !pricePanel.contains(e.target) && e.target !== fabConfig && !fabConfig.contains(e.target)) {
       pricePanel.hidden = true;
     }
   });
 
-  // ---------- Init ----------
-  // Asegurar que equipos antiguos tengan estado
-  equipos.forEach(eq => {
-    if (!eq.estado) eq.estado = 'idle';
+  // ---------- Limpiar historial ----------
+  btnClearHistorial.addEventListener('click', () => {
+    confirmCallback = () => {
+      historial = [];
+      save();
+      renderHistorial();
+    };
+    document.getElementById('confirmTitle').textContent = '¿Limpiar historial?';
+    document.getElementById('confirmText').textContent = 'Se borrarán todos los registros de cobros.';
+    openModal(modalConfirm);
   });
+
+  // ---------- Init ----------
   render();
+  renderHistorial();
 });

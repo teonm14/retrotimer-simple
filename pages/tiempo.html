@@ -6,6 +6,8 @@
   <title>RetroControl - Gestión de Tiempo</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/tiempo.css">
+  <script type="module" src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
   <div class="app">
@@ -16,7 +18,7 @@
     </header>
 
     <div class="main-container">
-      <!-- Sidebar -->
+      <!-- Sidebar navegación -->
       <aside class="sidebar">
         <nav class="nav">
           <a href="../index.html" class="nav-btn">Inicio</a>
@@ -24,15 +26,30 @@
         </nav>
       </aside>
 
+      <!-- Sidebar Historial -->
+      <aside class="historial-sidebar" id="historialSidebar">
+        <div class="historial-header">
+          <span class="historial-title">
+            <ion-icon name="time-outline"></ion-icon> Historial
+          </span>
+          <button class="btn-clear-historial" id="btnClearHistorial" title="Limpiar historial">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
+        <div class="historial-list" id="historialList">
+          <!-- Se llena con JS -->
+        </div>
+      </aside>
+
       <!-- Content -->
       <main class="content">
-        <!-- Barra Equipos + Añadir -->
         <div class="equipos-header">
           <span class="equipos-title">Equipos</span>
-          <button class="btn-add" id="btnAddEquipo">+ Añadir</button>
+          <button class="btn-add" id="btnAddEquipo">
+            <ion-icon name="add-outline"></ion-icon> Añadir
+          </button>
         </div>
 
-        <!-- Lista de equipos -->
         <div class="equipos-list" id="equiposList">
           <!-- Se llena con JS -->
         </div>
@@ -40,10 +57,12 @@
     </div>
   </div>
 
-  <!-- Botón flotante configuración de precios -->
-  <button class="fab-config" id="fabConfig" title="Configurar precios">⚙</button>
+  <!-- FAB configuración de precios -->
+  <button class="fab-config" id="fabConfig" title="Configurar precios">
+    <ion-icon name="settings-outline"></ion-icon>
+  </button>
 
-  <!-- ========== PANEL AJUSTE DE PRECIO ========== -->
+  <!-- Panel ajuste de precio -->
   <div class="price-panel" id="pricePanel" hidden>
     <div class="price-panel-inner">
       <span class="price-label">Ajuste de Precio</span>
@@ -60,7 +79,7 @@
     </div>
   </div>
 
-  <!-- ========== MODAL: Nuevo Equipo ========== -->
+  <!-- Modal: Nuevo Equipo -->
   <div class="modal-overlay" id="modalNuevoEquipo" hidden>
     <div class="modal">
       <h3 class="modal-title">Nuevo Equipo</h3>
@@ -78,7 +97,7 @@
     </div>
   </div>
 
-  <!-- ========== MODAL: Tiempo (Definido / Agregar / Límite / Restar) ========== -->
+  <!-- Modal: Tiempo (Definido / Agregar / Límite / Restar) -->
   <div class="modal-overlay" id="modalTiempo" hidden>
     <div class="modal">
       <h3 class="modal-title" id="modalTiempoTitle">Tiempo Definido</h3>
@@ -93,19 +112,36 @@
     </div>
   </div>
 
-  <!-- ========== MODAL: Cobrar ========== -->
-  <div class="modal-overlay" id="modalCobrar" hidden>
+  <!-- Modal: Notas -->
+  <div class="modal-overlay" id="modalNotas" hidden>
     <div class="modal">
-      <h3 class="modal-title">Cobrar</h3>
+      <h3 class="modal-title">Notas rápidas</h3>
       <div class="modal-body">
-        <p class="cobrar-info" id="cobrarInfo">Tiempo utilizado: 00:00:00</p>
-        <p class="cobrar-total" id="cobrarTotal">Total a cobrar: $0.00</p>
+        <textarea id="inputNotas" class="modal-textarea" rows="4" placeholder="Escribe una nota para este equipo..."></textarea>
       </div>
-      <button class="modal-btn" id="btnCerrarCobrar">Aceptar</button>
+      <button class="modal-btn" id="btnGuardarNotas">Guardar</button>
     </div>
   </div>
 
-  <!-- ========== MODAL: Confirmación ========== -->
+  <!-- Modal: Cobrar -->
+  <div class="modal-overlay" id="modalCobrar" hidden>
+    <div class="modal modal-cobrar">
+      <h3 class="modal-title">Cobrar</h3>
+      <div class="modal-body">
+        <p class="cobrar-info" id="cobrarInfo">Tiempo utilizado: 00:00:00</p>
+        <p class="cobrar-base" id="cobrarBase">Tiempo: $0.00</p>
+        <label class="modal-label">Extra (copias, abarrotes, etc.):</label>
+        <div class="extra-row">
+          <span>$</span>
+          <input type="number" id="inputExtra" class="modal-input modal-input-num" min="0" step="0.01" value="0">
+        </div>
+        <p class="cobrar-total" id="cobrarTotal">Total a cobrar: $0.00</p>
+      </div>
+      <button class="modal-btn" id="btnConfirmarCobrar">Cobrar</button>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmación -->
   <div class="modal-overlay" id="modalConfirm" hidden>
     <div class="modal">
       <h3 class="modal-title" id="confirmTitle">¿Estás seguro?</h3>
