@@ -6,7 +6,7 @@
 .historial-sidebar {
   width: 220px;
   background-color: #140a12;
-  border-right: 1px solid #2a1520;
+  border-left: 1px solid #2a1520;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -233,15 +233,38 @@
 .equipo-icon.pc { background: #1565c0; }
 .equipo-icon.playstation { background: #003791; }
 
+.equipo-icon ion-icon {
+  font-size: 1.15rem;
+  color: white;
+}
+
 .equipo-nombre {
   font-weight: 600;
   font-size: 0.95rem;
   white-space: nowrap;
 }
 
-.notas-indicator {
-  color: var(--yellow);
-  font-size: 0.9rem;
+/* Notas inline en la fila */
+.notas-input {
+  width: 130px;
+  min-width: 90px;
+  flex: 0 1 130px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #111;
+  color: white;
+  font-size: 0.8rem;
+  font-family: inherit;
+}
+
+.notas-input:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.notas-input::placeholder {
+  color: #666;
 }
 
 .badge-paused {
