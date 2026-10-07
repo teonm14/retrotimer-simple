@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetroControl - Gestión de Tiempo</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/tiempo.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="logo">RetroControl</h1>
+      <span class="header-title">Gestión de Tiempo</span>
+    </header>
+
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <nav class="nav">
+          <a href="../index.html" class="nav-btn">Inicio</a>
+          <a href="tiempo.html" class="nav-btn active">Gestión Tiempo</a>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="content">
+        <!-- Barra Equipos + Añadir -->
+        <div class="equipos-header">
+          <span class="equipos-title">Equipos</span>
+          <button class="btn-add" id="btnAddEquipo">+ Añadir</button>
+        </div>
+
+        <!-- Lista de equipos -->
+        <div class="equipos-list" id="equiposList">
+          <!-- Se llena con JS -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Botón flotante configuración de precios -->
+  <button class="fab-config" id="fabConfig" title="Configurar precios">⚙</button>
+
+  <!-- ========== PANEL AJUSTE DE PRECIO ========== -->
+  <div class="price-panel" id="pricePanel" hidden>
+    <div class="price-panel-inner">
+      <span class="price-label">Ajuste de Precio</span>
+      <div class="price-fields">
+        <input type="number" id="priceAmount" min="0" step="1" value="30" class="price-input">
+        <span>por</span>
+        <input type="number" id="pricePer" min="1" step="1" value="30" class="price-input price-per">
+        <select id="priceUnit" class="price-select">
+          <option value="minutos">MINUTOS</option>
+          <option value="horas">HORAS</option>
+        </select>
+      </div>
+      <button class="btn-price-save" id="btnSavePrice">Guardar</button>
+    </div>
+  </div>
+
+  <!-- ========== MODAL: Nuevo Equipo ========== -->
+  <div class="modal-overlay" id="modalNuevoEquipo" hidden>
+    <div class="modal">
+      <h3 class="modal-title">Nuevo Equipo</h3>
+      <div class="modal-body">
+        <label class="modal-label">Nombre:</label>
+        <input type="text" id="inputNombre" class="modal-input" placeholder="Ej: XBOX 1" autocomplete="off">
+        <label class="modal-label">Tipo:</label>
+        <select id="inputTipo" class="modal-select">
+          <option value="PC">PC</option>
+          <option value="XBOX">XBOX</option>
+          <option value="PLAYSTATION">PLAYSTATION</option>
+        </select>
+      </div>
+      <button class="modal-btn" id="btnAceptarNuevo">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- ========== MODAL: Tiempo (Definido / Agregar / Límite / Restar) ========== -->
+  <div class="modal-overlay" id="modalTiempo" hidden>
+    <div class="modal">
+      <h3 class="modal-title" id="modalTiempoTitle">Tiempo Definido</h3>
+      <div class="modal-body modal-body-row">
+        <input type="number" id="inputTiempoValor" class="modal-input modal-input-num" min="0" value="0">
+        <select id="inputTiempoUnidad" class="modal-select modal-select-sm">
+          <option value="minutos">Minutos</option>
+          <option value="horas">Horas</option>
+        </select>
+      </div>
+      <button class="modal-btn" id="btnAceptarTiempo">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- ========== MODAL: Cobrar ========== -->
+  <div class="modal-overlay" id="modalCobrar" hidden>
+    <div class="modal">
+      <h3 class="modal-title">Cobrar</h3>
+      <div class="modal-body">
+        <p class="cobrar-info" id="cobrarInfo">Tiempo utilizado: 00:00:00</p>
+        <p class="cobrar-total" id="cobrarTotal">Total a cobrar: $0.00</p>
+      </div>
+      <button class="modal-btn" id="btnCerrarCobrar">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- ========== MODAL: Confirmación ========== -->
+  <div class="modal-overlay" id="modalConfirm" hidden>
+    <div class="modal">
+      <h3 class="modal-title" id="confirmTitle">¿Estás seguro?</h3>
+      <div class="modal-body">
+        <p class="confirm-text" id="confirmText">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="btnConfirmNo">No</button>
+        <button class="modal-btn" id="btnConfirmSi">Sí</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/tiempo.js"></script>
+</body>
+</html>

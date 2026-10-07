@@ -9,15 +9,24 @@
 }
 
 :root {
-  --header-bg: #c2185b;
-  --sidebar-bg: #4a0e4e;
+  --header-bg: #950952;
+  --sidebar-bg: #5e0035;
   --content-bg: #0d0d0d;
-  --card-bg: #00838f;
-  --card-hover: #00acc1;
+  --teal: #005c69;
+  --teal-light: #037a8a;
+  --card-bg: #025c69;
+  --card-hover: #037a8a;
+  --pink: #c2185b;
+  --pink-dark: #9e1349;
+  --green: #2e7d32;
+  --green-light: #43a047;
+  --yellow: #f9a825;
+  --red: #c62828;
   --text-color: #ffffff;
   --nav-btn-bg: transparent;
   --nav-btn-active-border: #00bcd4;
   --nav-btn-hover: rgba(0, 188, 212, 0.15);
+  --modal-bg: #025c69;
 }
 
 @font-face {
@@ -26,62 +35,62 @@
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-Black.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-BlackItalic.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-Bold.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-BoldItalic.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-ExtraBold.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-ExtraBoldItalic.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-Italic.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-Light.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-LightItalic.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-Medium.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'MonserratAlternatives';
+    font-family: 'MontserratAlternatives';
     src: url('../assets/fonts/Montserrat_Alternates/MontserratAlternates-MediumItalic.ttf') format('truetype');
 }
 
 body {
-  font-family: 'MonserratAlternatives', system-ui, -apple-system, sans-serif;
+  font-family: 'MonsterratAlternatives', system-ui, -apple-system, sans-serif;
   background-color: var(--content-bg);
   color: var(--text-color);
   min-height: 100vh;
@@ -96,15 +105,24 @@ body {
 /* ========== HEADER ========== */
 .header {
   background-color: var(--header-bg);
-  padding: 0.9rem 1.5rem;
+  padding: 0.85rem 1.5rem;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .logo {
-    font-family: 'Audiowide', Courier, monospace;
-  font-size: 1.4rem;
+  font-family: 'Audiowide', Courier, monospace;
+  font-size: 1.35rem;
   font-weight: 600;
   letter-spacing: 0.5px;
+}
+
+.header-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  opacity: 0.95;
 }
 
 /* ========== LAYOUT ========== */
@@ -157,7 +175,7 @@ body {
 /* ========== CONTENT ========== */
 .content {
   flex: 1;
-  padding: 2.5rem 2rem;
+  padding: 1.5rem 1.5rem;
   overflow-y: auto;
   background-color: var(--content-bg);
 }
@@ -222,7 +240,7 @@ body {
 }
 
 /* ========== RESPONSIVE ========== */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .main-container {
     flex-direction: column;
   }
@@ -239,10 +257,14 @@ body {
   }
 
   .content {
-    padding: 1.5rem 1rem;
+    padding: 1rem;
   }
 
   .welcome-title {
     font-size: 1.3rem;
+  }
+
+  .header-title {
+    font-size: 0.95rem;
   }
 }
