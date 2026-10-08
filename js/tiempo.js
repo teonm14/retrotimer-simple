@@ -862,6 +862,63 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal(modalConfirm);
   });
 
+  /* ----- Cancelar en modales ----- */
+  var btnCancelarNuevo = document.getElementById('btnCancelarNuevo');
+  if (btnCancelarNuevo) {
+    btnCancelarNuevo.addEventListener('click', function() {
+      editingEquipoId = null;
+      closeModal(modalNuevo);
+    });
+  }
+  var btnCancelarTiempo = document.getElementById('btnCancelarTiempo');
+  if (btnCancelarTiempo) {
+    btnCancelarTiempo.addEventListener('click', function() {
+      closeModal(modalTiempo);
+    });
+  }
+  var btnCancelarCobrar = document.getElementById('btnCancelarCobrar');
+  if (btnCancelarCobrar) {
+    btnCancelarCobrar.addEventListener('click', function() {
+      cobrarContext = null;
+      closeModal(modalCobrar);
+    });
+  }
+
+  /* ----- Historial mostrar / ocultar ----- */
+  var historialSidebar = document.getElementById('historialSidebar');
+  var btnToggleHistorial = document.getElementById('btnToggleHistorial');
+  var btnHideHistorial = document.getElementById('btnHideHistorial');
+  var toggleHistorialLabel = document.getElementById('toggleHistorialLabel');
+
+  function setHistorialVisible(visible) {
+    if (!historialSidebar) return;
+    if (visible) {
+      historialSidebar.classList.remove('is-hidden');
+    } else {
+      historialSidebar.classList.add('is-hidden');
+    }
+    localStorage.setItem('rc_historial_visible', visible ? '1' : '0');
+    if (toggleHistorialLabel) {
+      toggleHistorialLabel.textContent = visible ? 'Ocultar historial' : 'Historial';
+    }
+  }
+
+  var histPref = localStorage.getItem('rc_historial_visible');
+  // Por defecto visible en desktop; en móvil el CSS ya lo oculta
+  setHistorialVisible(histPref !== '0');
+
+  if (btnToggleHistorial) {
+    btnToggleHistorial.addEventListener('click', function() {
+      var visible = historialSidebar && !historialSidebar.classList.contains('is-hidden');
+      setHistorialVisible(!visible);
+    });
+  }
+  if (btnHideHistorial) {
+    btnHideHistorial.addEventListener('click', function() {
+      setHistorialVisible(false);
+    });
+  }
+
   render();
   renderHistorial();
 });

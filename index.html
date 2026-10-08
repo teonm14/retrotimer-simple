@@ -5,31 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RetroControl - Inicio</title>
   <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
   <div class="app">
-    <!-- Header -->
     <header class="header">
       <h1 class="logo">RetroControl</h1>
+      <div class="header-actions">
+        <button class="btn-header-icon" id="btnNotif" title="Novedades" type="button">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <span class="notif-dot" id="notifDot"></span>
+        </button>
+      </div>
     </header>
 
     <div class="main-container">
-      <!-- Sidebar -->
       <aside class="sidebar">
         <nav class="nav">
           <a href="index.html" class="nav-btn active">Inicio</a>
           <a href="pages/tiempo.html" class="nav-btn">Gestión Tiempo</a>
         </nav>
+        <div class="sidebar-footer">
+          <button type="button" class="nav-btn nav-btn-about" id="btnAbout">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Acerca de
+          </button>
+        </div>
       </aside>
 
-      <!-- Content -->
       <main class="content">
+        <h2 class="page-title page-title-home">Inicio</h2>
         <h2 class="welcome-title">Gestiona el tiempo de tus equipos</h2>
 
         <div class="cards">
           <a href="pages/tiempo.html" class="card">
             <div class="card-icon">
-              <!-- Icono de reloj simple con SVG -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
@@ -39,6 +50,45 @@
           </a>
         </div>
       </main>
+    </div>
+  </div>
+
+  <div class="notif-panel" id="notifPanel" hidden>
+    <div class="notif-panel-header">
+      <span>Novedades</span>
+      <button type="button" class="btn-header-icon" id="btnCloseNotif" title="Cerrar">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+    <div class="notif-list" id="notifList"></div>
+  </div>
+
+  <div class="modal-overlay" id="modalAbout" hidden>
+    <div class="modal modal-about">
+      <h3 class="modal-title">Acerca de RetroControl</h3>
+      <div class="modal-body about-body">
+        <div class="about-brand">
+          <span class="about-logo">RetroControl</span>
+          <span class="about-version">v1.0 · Gestión de tiempo</span>
+        </div>
+        <p class="about-text">
+          Sistema para administrar sesiones de juego en PCs, Xbox y PlayStation:
+          tiempo definido, tiempo libre, cobros, historial y notas.
+        </p>
+        <div class="about-meta">
+          <p><strong>Desarrollador:</strong> Teofilo Naredo Matamoros</p>
+          <p><strong>Copyright © 2026</strong> RetroControl. Todos los derechos reservados.</p>
+          <p class="about-license">Uso interno / licencia del propietario del software.</p>
+        </div>
+        <div class="about-feedback">
+          <h4 class="about-feedback-title">Solicitudes y comentarios</h4>
+          <p class="about-feedback-hint">Reporta errores o sugiere mejoras. Se abrirá tu correo.</p>
+          <textarea id="feedbackText" class="modal-textarea" rows="3" placeholder="Describe el error o la mejora que propones..."></textarea>
+          <button type="button" class="modal-btn" id="btnEnviarFeedback">Enviar comentario</button>
+          <p class="feedback-thanks" id="feedbackThanks" hidden>¡Gracias! Revisa tu cliente de correo para enviarlo.</p>
+        </div>
+      </div>
+      <button class="modal-btn modal-btn-cancel" id="btnCerrarAbout" type="button">Cerrar</button>
     </div>
   </div>
 

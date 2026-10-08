@@ -13,7 +13,12 @@
   <div class="app">
     <header class="header">
       <h1 class="logo">RetroControl</h1>
-      <span class="header-title">Gestión de Tiempo</span>
+      <div class="header-actions">
+        <button class="btn-header-icon" id="btnNotif" title="Novedades" type="button">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <span class="notif-dot" id="notifDot"></span>
+        </button>
+      </div>
     </header>
 
     <div class="main-container">
@@ -22,9 +27,23 @@
           <a href="../index.html" class="nav-btn">Inicio</a>
           <a href="tiempo.html" class="nav-btn active">Gestión Tiempo</a>
         </nav>
+        <div class="sidebar-footer">
+          <button type="button" class="nav-btn nav-btn-about" id="btnAbout">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Acerca de
+          </button>
+        </div>
       </aside>
 
       <main class="content">
+        <div class="page-header">
+          <h2 class="page-title">Gestión de Tiempo</h2>
+          <button type="button" class="btn-toggle-historial" id="btnToggleHistorial" title="Mostrar/ocultar historial">
+            <ion-icon name="time-outline"></ion-icon>
+            <span id="toggleHistorialLabel">Historial</span>
+          </button>
+        </div>
+
         <div class="equipos-header">
           <span class="equipos-title">Equipos</span>
           <button class="btn-add" id="btnAddEquipo">
@@ -34,15 +53,19 @@
         <div class="equipos-list" id="equiposList"></div>
       </main>
 
-      <!-- Historial a la DERECHA -->
       <aside class="historial-sidebar" id="historialSidebar">
         <div class="historial-header">
           <span class="historial-title">
             <ion-icon name="time-outline"></ion-icon> Historial
           </span>
-          <button class="btn-clear-historial" id="btnClearHistorial" title="Limpiar historial">
-            <ion-icon name="trash-outline"></ion-icon>
-          </button>
+          <div class="historial-header-actions">
+            <button class="btn-clear-historial" id="btnClearHistorial" title="Limpiar historial">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+            <button class="btn-clear-historial" id="btnHideHistorial" title="Ocultar historial">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+          </div>
         </div>
         <div class="historial-list" id="historialList"></div>
       </aside>
@@ -80,6 +103,18 @@
     </div>
   </div>
 
+  <!-- Notificaciones -->
+  <div class="notif-panel" id="notifPanel" hidden>
+    <div class="notif-panel-header">
+      <span>Novedades</span>
+      <button type="button" class="btn-clear-historial" id="btnCloseNotif" title="Cerrar">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+    <div class="notif-list" id="notifList"></div>
+  </div>
+
+  <!-- Calculadora -->
   <div class="modal-overlay" id="modalCalc" hidden>
     <div class="modal modal-calc">
       <h3 class="modal-title">Calculadora</h3>
@@ -109,6 +144,7 @@
     </div>
   </div>
 
+  <!-- Nuevo / Editar equipo -->
   <div class="modal-overlay" id="modalNuevoEquipo" hidden>
     <div class="modal">
       <h3 class="modal-title" id="modalEquipoTitle">Nuevo Equipo</h3>
@@ -122,7 +158,10 @@
           <option value="PLAYSTATION">PLAYSTATION</option>
         </select>
       </div>
-      <button class="modal-btn" id="btnAceptarNuevo">Aceptar</button>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="btnCancelarNuevo" type="button">Cancelar</button>
+        <button class="modal-btn" id="btnAceptarNuevo" type="button">Aceptar</button>
+      </div>
     </div>
   </div>
 
@@ -136,7 +175,10 @@
           <option value="horas">Horas</option>
         </select>
       </div>
-      <button class="modal-btn" id="btnAceptarTiempo">Aceptar</button>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="btnCancelarTiempo" type="button">Cancelar</button>
+        <button class="modal-btn" id="btnAceptarTiempo" type="button">Aceptar</button>
+      </div>
     </div>
   </div>
 
@@ -153,7 +195,10 @@
         </div>
         <p class="cobrar-total" id="cobrarTotal">Total a cobrar: $0.00</p>
       </div>
-      <button class="modal-btn" id="btnConfirmarCobrar">Cobrar</button>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="btnCancelarCobrar" type="button">Cancelar</button>
+        <button class="modal-btn" id="btnConfirmarCobrar" type="button">Cobrar</button>
+      </div>
     </div>
   </div>
 
@@ -167,6 +212,37 @@
         <button class="modal-btn modal-btn-cancel" id="btnConfirmNo">No</button>
         <button class="modal-btn" id="btnConfirmSi">Sí</button>
       </div>
+    </div>
+  </div>
+
+  <!-- About -->
+  <div class="modal-overlay" id="modalAbout" hidden>
+    <div class="modal modal-about">
+      <h3 class="modal-title">Acerca de RetroControl</h3>
+      <div class="modal-body about-body">
+        <div class="about-brand">
+          <span class="about-logo">RetroControl</span>
+          <span class="about-version">v1.0 · Gestión de tiempo</span>
+        </div>
+        <p class="about-text">
+          Sistema para administrar sesiones de juego en PCs, Xbox y PlayStation:
+          tiempo definido, tiempo libre, cobros, historial y notas.
+        </p>
+        <div class="about-meta">
+          <p><strong>Desarrollador:</strong> Equipo RetroControl</p>
+          <p><strong>Copyright © 2026</strong> RetroControl. Todos los derechos reservados.</p>
+          <p class="about-license">Uso interno / licencia del propietario del software.</p>
+        </div>
+
+        <div class="about-feedback">
+          <h4 class="about-feedback-title">Solicitudes y comentarios</h4>
+          <p class="about-feedback-hint">Reporta errores o sugiere mejoras. Se abrirá tu correo.</p>
+          <textarea id="feedbackText" class="modal-textarea" rows="3" placeholder="Describe el error o la mejora que propones..."></textarea>
+          <button type="button" class="modal-btn" id="btnEnviarFeedback">Enviar comentario</button>
+          <p class="feedback-thanks" id="feedbackThanks" hidden>¡Gracias! Revisa tu cliente de correo para enviarlo.</p>
+        </div>
+      </div>
+      <button class="modal-btn modal-btn-cancel" id="btnCerrarAbout" type="button">Cerrar</button>
     </div>
   </div>
 

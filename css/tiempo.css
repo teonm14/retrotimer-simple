@@ -4,6 +4,17 @@
    =========================== */
 
 /* ----- Historial sidebar ----- */
+
+.historial-sidebar.is-hidden {
+  display: none;
+}
+
+.historial-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
 .historial-sidebar {
   width: 260px;
   background-color: var(--surface);
@@ -935,13 +946,35 @@
 
 /* Responsive */
 @media (max-width: 960px) {
-  .historial-sidebar {
+  
+.historial-sidebar.is-hidden {
+  display: none;
+}
+
+.historial-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.historial-sidebar {
     width: 220px;
   }
 }
 
 @media (max-width: 700px) {
-  .historial-sidebar {
+  
+.historial-sidebar.is-hidden {
+  display: none;
+}
+
+.historial-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.historial-sidebar {
     display: none;
   }
 
