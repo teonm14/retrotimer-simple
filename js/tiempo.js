@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderHistorial() {
     if (!historialList) return;
     if (historial.length === 0) {
-      historialList.innerHTML = '<p class="historial-empty">Sin registros aún</p>';
+      historialList.innerHTML = '<p class="historial-empty">Sin registros aún.<br>Los cobros aparecerán aquí.</p>';
       return;
     }
     const items = historial.slice().reverse();
@@ -162,7 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
     var focusedNotasPos = focusedNotasId ? active.selectionStart : null;
 
     if (equipos.length === 0) {
-      equiposList.innerHTML = '';
+      equiposList.innerHTML =
+        '<div class="equipos-empty">' +
+          '<ion-icon name="desktop-outline"></ion-icon>' +
+          '<p>No hay equipos todavía.<br>Pulsa <strong>Añadir</strong> para crear el primero.</p>' +
+        '</div>';
       return;
     }
 
@@ -171,20 +175,24 @@ document.addEventListener('DOMContentLoaded', () => {
       var iClass = iconClass(eq.tipo);
       var notasVal = (eq.notas || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
       var notasInput = '<input type="text" class="notas-input" data-id="' + eq.id +
-        '" placeholder="Notas..." value="' + notasVal + '" title="Notas de esta sesión">';
+        '" placeholder="Notas de la sesión..." value="' + notasVal + '" title="Notas de esta sesión">';
 
       if (eq.estado === 'idle') {
         return '<div class="equipo-row" data-id="' + eq.id + '">' +
-          '<div class="equipo-info">' +
-            '<div class="equipo-icon ' + iClass + '"><ion-icon name="' + iName + '"></ion-icon></div>' +
-            '<span class="equipo-nombre">' + eq.nombre + '</span>' +
+          '<div class="equipo-row-top">' +
+            '<div class="equipo-info">' +
+              '<div class="equipo-icon ' + iClass + '"><ion-icon name="' + iName + '"></ion-icon></div>' +
+              '<span class="equipo-nombre">' + eq.nombre + '</span>' +
+            '</div>' +
+            '<div class="acciones-idle">' +
+              '<button class="btn-accion btn-definido" data-action="definido">Definido</button>' +
+              '<button class="btn-accion btn-libre" data-action="libre">Libre</button>' +
+              '<button class="btn-accion btn-eliminar" data-action="eliminar" title="Eliminar">' +
+                '<ion-icon name="trash-outline"></ion-icon>' +
+              '</button>' +
+            '</div>' +
           '</div>' +
-          notasInput +
-          '<button class="btn-accion btn-definido" data-action="definido">Tiempo Definido</button>' +
-          '<button class="btn-accion btn-libre" data-action="libre">Tiempo Libre</button>' +
-          '<button class="btn-accion btn-eliminar" data-action="eliminar" title="Eliminar">' +
-            '<ion-icon name="trash-outline"></ion-icon>' +
-          '</button>' +
+          '<div class="equipo-notas-row">' + notasInput + '</div>' +
         '</div>';
       }
 
@@ -194,28 +202,31 @@ document.addEventListener('DOMContentLoaded', () => {
         var pct = eq.tiempoTotal > 0 ? (restante / eq.tiempoTotal) * 100 : 0;
         var pauseIcon = eq.pausado ? 'play' : 'pause';
         return '<div class="equipo-row ' + (eq.pausado ? 'is-paused' : '') + '" data-id="' + eq.id + '">' +
-          '<div class="equipo-info">' +
-            '<div class="equipo-icon ' + iClass + '"><ion-icon name="' + iName + '"></ion-icon></div>' +
-            '<span class="equipo-nombre">' + eq.nombre + '</span>' +
-            (eq.pausado ? '<span class="badge-paused">PAUSA</span>' : '') +
-          '</div>' +
-          '<div class="tiempo-info">' +
-            '<div class="progress-wrap">' +
-              '<div class="progress-bar" data-bar style="width:' + pct + '%"></div>' +
-              '<span class="progress-text" data-time>Restante: ' + formatTime(restante) + '</span>' +
+          '<div class="equipo-row-top">' +
+            '<div class="equipo-info">' +
+              '<div class="equipo-icon ' + iClass + '"><ion-icon name="' + iName + '"></ion-icon></div>' +
+              '<span class="equipo-nombre">' + eq.nombre + '</span>' +
+              '<span class="badge-mode">Definido</span>' +
+              (eq.pausado ? '<span class="badge-paused">Pausa</span>' : '') +
+            '</div>' +
+            '<div class="tiempo-info">' +
+              '<div class="progress-wrap">' +
+                '<div class="progress-bar" data-bar style="width:' + pct + '%"></div>' +
+                '<span class="progress-text" data-time>Restante: ' + formatTime(restante) + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="acciones-activas">' +
+              '<button class="btn-accion btn-pause" data-action="pause" title="' + (eq.pausado ? 'Reanudar' : 'Pausar') + '">' +
+                '<ion-icon name="' + pauseIcon + '-outline"></ion-icon>' +
+              '</button>' +
+              '<button class="btn-accion btn-agregar" data-action="agregar">+ Tiempo</button>' +
+              '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
+              '<button class="btn-accion btn-cancelar" data-action="cancelar" title="Cancelar sesión">' +
+                '<ion-icon name="close-outline"></ion-icon>' +
+              '</button>' +
             '</div>' +
           '</div>' +
-          notasInput +
-          '<div class="acciones-activas">' +
-            '<button class="btn-accion btn-pause" data-action="pause" title="' + (eq.pausado ? 'Reanudar' : 'Pausar') + '">' +
-              '<ion-icon name="' + pauseIcon + '-outline"></ion-icon>' +
-            '</button>' +
-            '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
-            '<button class="btn-accion btn-agregar" data-action="agregar">+ Tiempo</button>' +
-            '<button class="btn-accion btn-cancelar" data-action="cancelar">' +
-              '<ion-icon name="close-outline"></ion-icon>' +
-            '</button>' +
-          '</div>' +
+          '<div class="equipo-notas-row">' + notasInput + '</div>' +
         '</div>';
       }
 
@@ -225,28 +236,31 @@ document.addEventListener('DOMContentLoaded', () => {
         var pct2 = eq.limiteTotal > 0 ? (limRest / eq.limiteTotal) * 100 : 100;
         var pauseIcon2 = eq.pausado ? 'play' : 'pause';
         return '<div class="equipo-row ' + (eq.pausado ? 'is-paused' : '') + '" data-id="' + eq.id + '">' +
-          '<div class="equipo-info">' +
-            '<div class="equipo-icon ' + iClass + '"><ion-icon name="' + iName + '"></ion-icon></div>' +
-            '<span class="equipo-nombre">' + eq.nombre + '</span>' +
-            (eq.pausado ? '<span class="badge-paused">PAUSA</span>' : '') +
-          '</div>' +
-          '<div class="tiempo-info">' +
-            '<div class="progress-wrap">' +
-              '<div class="progress-bar" data-bar style="width:' + pct2 + '%"></div>' +
-              '<span class="progress-text" data-time>' + formatTime(trans2) + ' / Límite ' + formatTime(limRest) + '</span>' +
+          '<div class="equipo-row-top">' +
+            '<div class="equipo-info">' +
+              '<div class="equipo-icon ' + iClass + '"><ion-icon name="' + iName + '"></ion-icon></div>' +
+              '<span class="equipo-nombre">' + eq.nombre + '</span>' +
+              '<span class="badge-mode">Libre</span>' +
+              (eq.pausado ? '<span class="badge-paused">Pausa</span>' : '') +
+            '</div>' +
+            '<div class="tiempo-info">' +
+              '<div class="progress-wrap">' +
+                '<div class="progress-bar" data-bar style="width:' + pct2 + '%"></div>' +
+                '<span class="progress-text" data-time>' + formatTime(trans2) + ' / Límite ' + formatTime(limRest) + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="acciones-activas">' +
+              '<button class="btn-accion btn-pause" data-action="pause" title="' + (eq.pausado ? 'Reanudar' : 'Pausar') + '">' +
+                '<ion-icon name="' + pauseIcon2 + '-outline"></ion-icon>' +
+              '</button>' +
+              '<button class="btn-accion btn-restar" data-action="restar">− Tiempo</button>' +
+              '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
+              '<button class="btn-accion btn-cancelar" data-action="cancelar" title="Cancelar sesión">' +
+                '<ion-icon name="close-outline"></ion-icon>' +
+              '</button>' +
             '</div>' +
           '</div>' +
-          notasInput +
-          '<div class="acciones-activas">' +
-            '<button class="btn-accion btn-pause" data-action="pause" title="' + (eq.pausado ? 'Reanudar' : 'Pausar') + '">' +
-              '<ion-icon name="' + pauseIcon2 + '-outline"></ion-icon>' +
-            '</button>' +
-            '<button class="btn-accion btn-restar" data-action="restar">− Tiempo</button>' +
-            '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
-            '<button class="btn-accion btn-cancelar" data-action="cancelar">' +
-              '<ion-icon name="close-outline"></ion-icon>' +
-            '</button>' +
-          '</div>' +
+          '<div class="equipo-notas-row">' + notasInput + '</div>' +
         '</div>';
       }
 
