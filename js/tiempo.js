@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentTiempoAction = null;
   let confirmCallback = null;
   let cobrarContext = null;
+  let editingEquipoId = null;
 
   function playFinishSound() {
     try {
@@ -173,9 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
     equiposList.innerHTML = equipos.map(function(eq) {
       var iName = iconName(eq.tipo);
       var iClass = iconClass(eq.tipo);
-      var notasVal = (eq.notas || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-      var notasInput = '<input type="text" class="notas-input" data-id="' + eq.id +
-        '" placeholder="Notas de la sesión..." value="' + notasVal + '" title="Notas de esta sesión">';
+      var notasVal = (eq.notas || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      var notasInput = '<textarea class="notas-input" data-id="' + eq.id +
+        '" placeholder="Notas de la sesión..." title="Notas de esta sesión" rows="1">' + notasVal + '</textarea>';
 
       if (eq.estado === 'idle') {
         return '<div class="equipo-row" data-id="' + eq.id + '">' +
@@ -187,6 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
             '<div class="acciones-idle">' +
               '<button class="btn-accion btn-definido" data-action="definido">Definido</button>' +
               '<button class="btn-accion btn-libre" data-action="libre">Libre</button>' +
+              '<button class="btn-accion btn-editar" data-action="editar" title="Editar equipo">' +
+                '<ion-icon name="create-outline"></ion-icon>' +
+              '</button>' +
               '<button class="btn-accion btn-eliminar" data-action="eliminar" title="Eliminar">' +
                 '<ion-icon name="trash-outline"></ion-icon>' +
               '</button>' +
@@ -212,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             '<div class="tiempo-info">' +
               '<div class="progress-wrap">' +
                 '<div class="progress-bar" data-bar style="width:' + pct + '%"></div>' +
-                '<span class="progress-text" data-time>Restante: ' + formatTime(restante) + '</span>' +
+                '<span class="progress-text" data-time>' + formatTime(trans) + ' · Restante ' + formatTime(restante) + '</span>' +
               '</div>' +
             '</div>' +
             '<div class="acciones-activas">' +
@@ -221,6 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
               '</button>' +
               '<button class="btn-accion btn-agregar" data-action="agregar">+ Tiempo</button>' +
               '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
+              '<button class="btn-accion btn-editar" data-action="editar" title="Editar equipo">' +
+                '<ion-icon name="create-outline"></ion-icon>' +
+              '</button>' +
               '<button class="btn-accion btn-cancelar" data-action="cancelar" title="Cancelar sesión">' +
                 '<ion-icon name="close-outline"></ion-icon>' +
               '</button>' +
@@ -255,6 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
               '</button>' +
               '<button class="btn-accion btn-restar" data-action="restar">− Tiempo</button>' +
               '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
+              '<button class="btn-accion btn-editar" data-action="editar" title="Editar equipo">' +
+                '<ion-icon name="create-outline"></ion-icon>' +
+              '</button>' +
               '<button class="btn-accion btn-cancelar" data-action="cancelar" title="Cancelar sesión">' +
                 '<ion-icon name="close-outline"></ion-icon>' +
               '</button>' +
@@ -276,6 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+
+    equiposList.querySelectorAll('.notas-input').forEach(function(ta) {
+      autoResizeNotas(ta);
+    });
   }
 
   function updateTimersUI() {
@@ -292,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var restante = Math.max(0, (eq.tiempoTotal || 0) - trans);
         var pct = eq.tiempoTotal > 0 ? (restante / eq.tiempoTotal) * 100 : 0;
         bar.style.width = pct + '%';
-        text.textContent = 'Restante: ' + formatTime(restante);
+        text.textContent = formatTime(trans) + ' · Restante ' + formatTime(restante);
       }
 
       if (eq.estado === 'libre') {
@@ -368,48 +382,67 @@ document.addEventListener('DOMContentLoaded', () => {
       eq.notas = input.value;
       localStorage.setItem('rc_equipos', JSON.stringify(equipos));
     }
+    autoResizeNotas(input);
   });
 
-  equiposList.addEventListener('keydown', function(e) {
-    if (e.target.classList.contains('notas-input') && e.key === 'Enter') {
-      e.preventDefault();
-      e.target.blur();
-    }
-  });
+  function autoResizeNotas(el) {
+    if (!el || !el.classList.contains('notas-input')) return;
+    el.style.height = 'auto';
+    var maxH = 5 * 1.4 * 16; // ~5 lines
+    try {
+      var cs = getComputedStyle(el);
+      maxH = parseFloat(cs.maxHeight) || maxH;
+    } catch (err) {}
+    el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
+  }
+
 
   btnAdd.addEventListener('click', function() {
+    editingEquipoId = null;
+    document.getElementById('modalEquipoTitle').textContent = 'Nuevo Equipo';
     document.getElementById('inputNombre').value = '';
     document.getElementById('inputTipo').value = 'PC';
     openModal(modalNuevo);
     setTimeout(function() { document.getElementById('inputNombre').focus(); }, 50);
   });
 
-  document.getElementById('btnAceptarNuevo').addEventListener('click', function() {
+  function acceptEquipoModal() {
     var nombre = document.getElementById('inputNombre').value.trim();
     var tipo = document.getElementById('inputTipo').value;
     if (!nombre) {
       document.getElementById('inputNombre').focus();
       return;
     }
-    equipos.push({
-      id: Date.now(),
-      nombre: nombre,
-      tipo: tipo,
-      estado: 'idle',
-      tiempoTotal: 0,
-      tiempoTranscurrido: 0,
-      limiteTotal: 0,
-      startTimestamp: null,
-      sessionStart: null,
-      pausedAccum: 0,
-      pausado: false,
-      notas: '',
-      alerted: false
-    });
+    if (editingEquipoId != null) {
+      var eqEdit = equipos.find(function(x) { return x.id === editingEquipoId; });
+      if (eqEdit) {
+        eqEdit.nombre = nombre;
+        eqEdit.tipo = tipo;
+      }
+      editingEquipoId = null;
+    } else {
+      equipos.push({
+        id: Date.now(),
+        nombre: nombre,
+        tipo: tipo,
+        estado: 'idle',
+        tiempoTotal: 0,
+        tiempoTranscurrido: 0,
+        limiteTotal: 0,
+        startTimestamp: null,
+        sessionStart: null,
+        pausedAccum: 0,
+        pausado: false,
+        notas: '',
+        alerted: false
+      });
+    }
     save();
     render();
     closeModal(modalNuevo);
-  });
+  }
+
+  document.getElementById('btnAceptarNuevo').addEventListener('click', acceptEquipoModal);
 
   equiposList.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-action]');
@@ -422,6 +455,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     var action = btn.dataset.action;
     currentEquipoId = id;
+
+    if (action === 'editar') {
+      editingEquipoId = id;
+      document.getElementById('modalEquipoTitle').textContent = 'Editar Equipo';
+      document.getElementById('inputNombre').value = eq.nombre || '';
+      document.getElementById('inputTipo').value = eq.tipo || 'PC';
+      openModal(modalNuevo);
+      setTimeout(function() { document.getElementById('inputNombre').focus(); }, 50);
+      return;
+    }
 
     if (action === 'definido') {
       currentTiempoAction = 'definido';
@@ -649,13 +692,36 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('priceUnit').value = priceConfig.unit;
   }
 
-  fabConfig.addEventListener('click', function() {
-    if (pricePanel.hidden) {
-      loadPriceUI();
-      pricePanel.hidden = false;
-    } else {
+  var toolsMenu = document.getElementById('toolsMenu');
+  var modalCalc = document.getElementById('modalCalc');
+
+  function closeTools() {
+    if (toolsMenu) toolsMenu.hidden = true;
+    if (pricePanel) pricePanel.hidden = true;
+  }
+
+  fabConfig.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (toolsMenu.hidden) {
       pricePanel.hidden = true;
+      toolsMenu.hidden = false;
+    } else {
+      closeTools();
     }
+  });
+
+  document.getElementById('btnMenuPrecio').addEventListener('click', function(e) {
+    e.stopPropagation();
+    toolsMenu.hidden = true;
+    loadPriceUI();
+    pricePanel.hidden = false;
+  });
+
+  document.getElementById('btnMenuCalc').addEventListener('click', function(e) {
+    e.stopPropagation();
+    toolsMenu.hidden = true;
+    calcReset();
+    openModal(modalCalc);
   });
 
   document.getElementById('btnSavePrice').addEventListener('click', function() {
@@ -669,8 +735,119 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.addEventListener('click', function(e) {
+    if (!toolsMenu.hidden && !toolsMenu.contains(e.target) && e.target !== fabConfig && !fabConfig.contains(e.target)) {
+      toolsMenu.hidden = true;
+    }
     if (!pricePanel.hidden && !pricePanel.contains(e.target) && e.target !== fabConfig && !fabConfig.contains(e.target)) {
       pricePanel.hidden = true;
+    }
+  });
+
+  /* ----- Calculadora ----- */
+  var calcDisplay = document.getElementById('calcDisplay');
+  var calcCurrent = '0';
+  var calcPrev = null;
+  var calcOp = null;
+  var calcFresh = true;
+
+  function calcUpdate() {
+    calcDisplay.textContent = calcCurrent;
+  }
+
+  function calcReset() {
+    calcCurrent = '0';
+    calcPrev = null;
+    calcOp = null;
+    calcFresh = true;
+    calcUpdate();
+  }
+
+  function calcCompute() {
+    if (calcPrev == null || calcOp == null) return;
+    var a = parseFloat(calcPrev);
+    var b = parseFloat(calcCurrent);
+    var r = 0;
+    if (calcOp === '+') r = a + b;
+    else if (calcOp === '-') r = a - b;
+    else if (calcOp === '*') r = a * b;
+    else if (calcOp === '/') r = b === 0 ? 0 : a / b;
+    calcCurrent = String(Math.round(r * 1e10) / 1e10);
+    calcPrev = null;
+    calcOp = null;
+    calcFresh = true;
+    calcUpdate();
+  }
+
+  document.querySelector('.calc-grid').addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-calc]');
+    if (!btn) return;
+    var k = btn.dataset.calc;
+    if (k >= '0' && k <= '9') {
+      if (calcFresh || calcCurrent === '0') {
+        calcCurrent = k;
+        calcFresh = false;
+      } else {
+        calcCurrent += k;
+      }
+      calcUpdate();
+      return;
+    }
+    if (k === '.') {
+      if (calcFresh) { calcCurrent = '0.'; calcFresh = false; }
+      else if (calcCurrent.indexOf('.') === -1) calcCurrent += '.';
+      calcUpdate();
+      return;
+    }
+    if (k === 'C') { calcReset(); return; }
+    if (k === '±') {
+      if (calcCurrent !== '0') {
+        calcCurrent = calcCurrent.charAt(0) === '-' ? calcCurrent.slice(1) : '-' + calcCurrent;
+        calcUpdate();
+      }
+      return;
+    }
+    if (k === '%') {
+      calcCurrent = String(parseFloat(calcCurrent) / 100);
+      calcUpdate();
+      return;
+    }
+    if (k === '=' ) { calcCompute(); return; }
+    if ('+-*/'.indexOf(k) !== -1) {
+      if (calcPrev != null && calcOp && !calcFresh) calcCompute();
+      calcPrev = calcCurrent;
+      calcOp = k;
+      calcFresh = true;
+    }
+  });
+
+  document.getElementById('btnCerrarCalc').addEventListener('click', function() {
+    closeModal(modalCalc);
+  });
+
+  /* ----- Enter para confirmar en modales ----- */
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    if (e.target.classList.contains('notas-input')) return; // newlines en notas
+
+    if (!modalNuevo.hidden) {
+      e.preventDefault();
+      acceptEquipoModal();
+      return;
+    }
+    if (!modalTiempo.hidden) {
+      e.preventDefault();
+      document.getElementById('btnAceptarTiempo').click();
+      return;
+    }
+    if (!modalCobrar.hidden) {
+      e.preventDefault();
+      document.getElementById('btnConfirmarCobrar').click();
+      return;
+    }
+    if (!modalConfirm.hidden) {
+      e.preventDefault();
+      document.getElementById('btnConfirmSi').click();
+      return;
     }
   });
 

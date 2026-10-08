@@ -49,9 +49,20 @@
     </div>
   </div>
 
-  <button class="fab-config" id="fabConfig" title="Configurar precios">
+  <button class="fab-config" id="fabConfig" title="Herramientas">
     <ion-icon name="settings-outline"></ion-icon>
   </button>
+
+  <div class="tools-menu" id="toolsMenu" hidden>
+    <button class="tools-menu-item" id="btnMenuPrecio" type="button">
+      <ion-icon name="cash-outline"></ion-icon>
+      <span>Ajustar precio</span>
+    </button>
+    <button class="tools-menu-item" id="btnMenuCalc" type="button">
+      <ion-icon name="calculator-outline"></ion-icon>
+      <span>Calculadora</span>
+    </button>
+  </div>
 
   <div class="price-panel" id="pricePanel" hidden>
     <div class="price-panel-inner">
@@ -69,9 +80,38 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalCalc" hidden>
+    <div class="modal modal-calc">
+      <h3 class="modal-title">Calculadora</h3>
+      <div class="calc-display" id="calcDisplay">0</div>
+      <div class="calc-grid">
+        <button type="button" class="calc-btn" data-calc="C">C</button>
+        <button type="button" class="calc-btn" data-calc="±">±</button>
+        <button type="button" class="calc-btn" data-calc="%">%</button>
+        <button type="button" class="calc-btn calc-op" data-calc="/">÷</button>
+        <button type="button" class="calc-btn" data-calc="7">7</button>
+        <button type="button" class="calc-btn" data-calc="8">8</button>
+        <button type="button" class="calc-btn" data-calc="9">9</button>
+        <button type="button" class="calc-btn calc-op" data-calc="*">×</button>
+        <button type="button" class="calc-btn" data-calc="4">4</button>
+        <button type="button" class="calc-btn" data-calc="5">5</button>
+        <button type="button" class="calc-btn" data-calc="6">6</button>
+        <button type="button" class="calc-btn calc-op" data-calc="-">−</button>
+        <button type="button" class="calc-btn" data-calc="1">1</button>
+        <button type="button" class="calc-btn" data-calc="2">2</button>
+        <button type="button" class="calc-btn" data-calc="3">3</button>
+        <button type="button" class="calc-btn calc-op" data-calc="+">+</button>
+        <button type="button" class="calc-btn calc-zero" data-calc="0">0</button>
+        <button type="button" class="calc-btn" data-calc=".">.</button>
+        <button type="button" class="calc-btn calc-eq" data-calc="=">=</button>
+      </div>
+      <button class="modal-btn modal-btn-cancel" id="btnCerrarCalc" type="button">Cerrar</button>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalNuevoEquipo" hidden>
     <div class="modal">
-      <h3 class="modal-title">Nuevo Equipo</h3>
+      <h3 class="modal-title" id="modalEquipoTitle">Nuevo Equipo</h3>
       <div class="modal-body">
         <label class="modal-label">Nombre:</label>
         <input type="text" id="inputNombre" class="modal-input" placeholder="Ej: XBOX 1" autocomplete="off">

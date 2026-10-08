@@ -318,7 +318,7 @@
 .notas-input {
   width: 100%;
   max-width: none;
-  padding: 0.4rem 0.65rem;
+  padding: 0.45rem 0.65rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--bg);
@@ -326,6 +326,12 @@
   font-size: 0.8rem;
   font-family: inherit;
   transition: border-color 0.15s;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.4;
+  min-height: 2.1em;
+  max-height: calc(1.4em * 5 + 0.9rem);
+  field-sizing: content;
 }
 
 .notas-input:focus {
@@ -797,6 +803,136 @@
   to { opacity: 1; transform: scale(1); }
 }
 
+
+/* ----- Tools menu (FAB) ----- */
+.tools-menu {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  z-index: 96;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  animation: fadeIn 0.15s ease;
+  min-width: 180px;
+}
+
+.tools-menu[hidden] {
+  display: none !important;
+}
+
+.tools-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+
+.tools-menu-item:hover {
+  background: var(--surface-3);
+  border-color: var(--accent);
+  transform: translateX(-2px);
+}
+
+.tools-menu-item ion-icon {
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+
+/* ----- Calculadora ----- */
+.modal-calc {
+  max-width: 300px;
+}
+
+.calc-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-height: 3rem;
+  overflow-x: auto;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+
+.calc-btn {
+  padding: 0.7rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+}
+
+.calc-btn:hover {
+  background: var(--border);
+}
+
+.calc-btn:active {
+  transform: scale(0.96);
+}
+
+.calc-op {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: transparent;
+}
+
+.calc-op:hover {
+  background: rgba(6, 182, 212, 0.25);
+}
+
+.calc-eq {
+  background: var(--primary);
+  color: white;
+  border-color: transparent;
+  grid-column: span 1;
+}
+
+.calc-eq:hover {
+  background: var(--primary-hover);
+}
+
+.calc-zero {
+  grid-column: span 2;
+}
+
+.btn-editar {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.5rem;
+}
+.btn-editar:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* Responsive */
 @media (max-width: 960px) {
   .historial-sidebar {
@@ -827,10 +963,15 @@
   }
 
 
-  .price-panel {
+  .price-panel,
+  .tools-menu {
     right: 12px;
     left: 12px;
     bottom: 80px;
+  }
+
+  .tools-menu {
+    left: auto;
   }
 
   .price-panel-inner {
