@@ -4,37 +4,37 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const NOTIF_VERSION = '2026-10-07-v2';
+  const NOTIF_VERSION = '2026-10-08-v3';
 
   const NOVEDADES = [
     {
       type: 'feature',
-      text: 'Editar equipos existentes (nombre y tipo) sin reiniciar la sesión.',
+      text: 'Alertas claras al vencer el tiempo: fila en rojo, badge y banner de equipos vencidos.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Menú de herramientas: ajustar precio y calculadora.',
+      text: 'Ticket de cobro en pantalla con opción de imprimir (equipo, tiempo, total, hora).',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Tiempo definido muestra transcurrido y restante.',
+      text: 'Deshacer el último cobro durante 20 segundos y recuperar la sesión del equipo.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Notas multilínea (hasta 5 líneas) y confirmar modales con Enter.',
+      text: 'Atajos de teclado: N (nuevo equipo), C (cobrar), Enter (confirmar).',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Historial se puede mostrar u ocultar. Sección Acerca de y novedades.',
+      text: 'Código del gestor de tiempo organizado en módulos (más fácil de mantener).',
       date: 'Oct 2026'
     },
     {
       type: 'fix',
-      text: 'Botones Cancelar en cobro y alta/edición de equipos.',
+      text: 'Mejor foco visible en botones e inputs para navegación con teclado.',
       date: 'Oct 2026'
     }
   ];

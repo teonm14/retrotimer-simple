@@ -8,7 +8,7 @@ import { removeHistorialById } from './historial.js';
 const UNDO_MS = 20000;
 
 let cobrarContext = null;
-let lastCobro = null; // { historialId, timeoutId }
+let lastCobro = null; // { historialId, timeoutId, sessionSnapshot }
 let onAfterCobro = null;
 let onUndo = null;
 
@@ -70,8 +70,25 @@ export function confirmarCobro() {
 
   historial.push(entry);
 
+  // Snapshot de la sesión para poder deshacer y restaurar datos
   const eq = equipos.find((x) => x.id === cobrarContext.id);
+  let sessionSnapshot = null;
   if (eq) {
+    // Congelar transcurrido actual antes de guardar
+    const trans = getTranscurrido(eq);
+    sessionSnapshot = {
+      equipoId: eq.id,
+      estado: eq.estado,
+      tiempoTotal: eq.tiempoTotal || 0,
+      tiempoTranscurrido: trans,
+      limiteTotal: eq.limiteTotal || 0,
+      sessionStart: eq.sessionStart,
+      pausedAccum: trans,
+      pausado: true, // al restaurar queda en pausa para no saltar el reloj
+      notas: eq.notas || '',
+      alerted: eq.alerted || false
+    };
+
     eq.estado = 'idle';
     eq.tiempoTotal = 0;
     eq.tiempoTranscurrido = 0;
@@ -88,7 +105,7 @@ export function confirmarCobro() {
   closeModal(document.getElementById('modalCobrar'));
 
   showTicket(entry);
-  scheduleUndo(historialId);
+  scheduleUndo(historialId, sessionSnapshot);
 
   const ctx = cobrarContext;
   cobrarContext = null;
@@ -116,7 +133,7 @@ export function printTicket() {
   window.print();
 }
 
-function scheduleUndo(historialId) {
+function scheduleUndo(historialId, sessionSnapshot) {
   if (lastCobro && lastCobro.timeoutId) {
     clearTimeout(lastCobro.timeoutId);
   }
@@ -132,7 +149,7 @@ function scheduleUndo(historialId) {
     lastCobro = null;
   }, UNDO_MS);
 
-  lastCobro = { historialId, timeoutId };
+  lastCobro = { historialId, timeoutId, sessionSnapshot };
 }
 
 function hideUndo() {
@@ -147,8 +164,30 @@ export function undoLastCobro() {
   if (!lastCobro) return;
   clearTimeout(lastCobro.timeoutId);
   removeHistorialById(lastCobro.historialId);
+
+  // Restaurar sesión del equipo si aún existe
+  const snap = lastCobro.sessionSnapshot;
+  if (snap) {
+    const eq = equipos.find((x) => x.id === snap.equipoId);
+    if (eq) {
+      eq.estado = snap.estado;
+      eq.tiempoTotal = snap.tiempoTotal;
+      eq.tiempoTranscurrido = snap.tiempoTranscurrido;
+      eq.limiteTotal = snap.limiteTotal;
+      eq.sessionStart = snap.sessionStart;
+      eq.pausedAccum = snap.pausedAccum;
+      eq.pausado = true;
+      eq.startTimestamp = null;
+      eq.notas = snap.notas || '';
+      eq.alerted = snap.alerted || false;
+      saveState();
+    }
+  }
+
   lastCobro = null;
   hideUndo();
+  // Cerrar ticket si sigue abierto
+  closeModal(document.getElementById('modalTicket'));
   if (typeof onUndo === 'function') onUndo();
 }
 

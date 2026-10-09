@@ -59,9 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setCobroCallbacks({
     afterCobro: () => refresh(),
-    afterUndo: () => {
-      renderHistorial(historialList);
-    }
+    afterUndo: () => refresh()
   });
 
   initCobroUI();
