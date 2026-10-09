@@ -44,13 +44,20 @@
           </button>
         </div>
 
+        <!-- Banner equipos vencidos -->
+        <div class="vencidos-banner" id="vencidosBanner" hidden></div>
+
         <div class="equipos-header">
           <span class="equipos-title">Equipos</span>
-          <button class="btn-add" id="btnAddEquipo">
+          <button class="btn-add" id="btnAddEquipo" title="Nuevo equipo (N)">
             <ion-icon name="add-outline"></ion-icon> Añadir
           </button>
         </div>
         <div class="equipos-list" id="equiposList"></div>
+
+        <p class="keyboard-hints" aria-hidden="true">
+          Atajos: <kbd>N</kbd> nuevo equipo · <kbd>C</kbd> cobrar (vencido/activo) · <kbd>Enter</kbd> confirmar modal
+        </p>
       </main>
 
       <aside class="historial-sidebar" id="historialSidebar">
@@ -246,7 +253,34 @@
     </div>
   </div>
 
+  <!-- Ticket de cobro -->
+  <div class="modal-overlay" id="modalTicket" hidden>
+    <div class="modal modal-ticket" id="ticketPrintArea">
+      <h3 class="modal-title">Ticket de cobro</h3>
+      <div class="ticket-body">
+        <div class="ticket-row"><span>Equipo</span><strong id="ticketEquipo">—</strong></div>
+        <div class="ticket-row"><span>Modo</span><strong id="ticketModo">—</strong></div>
+        <div class="ticket-row"><span>Tiempo</span><strong id="ticketTiempo">—</strong></div>
+        <div class="ticket-row"><span>Base</span><strong id="ticketBase">—</strong></div>
+        <div class="ticket-row"><span>Extra</span><strong id="ticketExtra">—</strong></div>
+        <div class="ticket-row ticket-total"><span>Total</span><strong id="ticketTotal">—</strong></div>
+        <div class="ticket-row"><span>Hora</span><strong id="ticketHora">—</strong></div>
+        <div class="ticket-row ticket-notas"><span>Notas</span><strong id="ticketNotas">—</strong></div>
+      </div>
+      <div class="modal-actions no-print">
+        <button class="modal-btn modal-btn-cancel" id="btnCerrarTicket" type="button">Cerrar</button>
+        <button class="modal-btn" id="btnPrintTicket" type="button">Imprimir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast deshacer cobro -->
+  <div class="undo-toast" id="undoToast" hidden role="status" aria-live="polite">
+    <span>Cobro registrado.</span>
+    <button type="button" class="btn-undo" id="btnUndoCobro">Deshacer</button>
+  </div>
+
   <script src="../js/main.js"></script>
-  <script src="../js/tiempo.js"></script>
+  <script type="module" src="../js/tiempo/app.js"></script>
 </body>
 </html>
