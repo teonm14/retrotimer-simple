@@ -382,22 +382,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const limitePanel = document.getElementById('limitePanel');
   const btnMenuLimite = document.getElementById('btnMenuLimite');
+  let draftHora = 22;
+  let draftMin = 0;
+
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function syncLimiteUI() {
+    const hEl = document.getElementById('limiteHoraDisplay');
+    const mEl = document.getElementById('limiteMinDisplay');
+    const hidden = document.getElementById('inputLimiteHora');
+    if (hEl) hEl.textContent = pad2(draftHora);
+    if (mEl) mEl.textContent = pad2(draftMin);
+    if (hidden) hidden.value = pad2(draftHora) + ':' + pad2(draftMin);
+    document.querySelectorAll('.limite-chip').forEach((chip) => {
+      const v = chip.getAttribute('data-hora');
+      chip.classList.toggle('is-active', v === pad2(draftHora) + ':' + pad2(draftMin));
+    });
+  }
+
+  function loadDraftFromConfig() {
+    if (limiteHora && /^\d{1,2}:\d{2}$/.test(limiteHora)) {
+      const parts = limiteHora.split(':');
+      draftHora = Math.min(23, Math.max(0, Number(parts[0]) || 0));
+      draftMin = Math.min(59, Math.max(0, Number(parts[1]) || 0));
+    } else {
+      draftHora = 22;
+      draftMin = 0;
+    }
+    syncLimiteUI();
+  }
+
   if (btnMenuLimite) {
     btnMenuLimite.addEventListener('click', (e) => {
       e.stopPropagation();
       toolsMenu.hidden = true;
-      const input = document.getElementById('inputLimiteHora');
-      if (input) input.value = limiteHora || '';
+      loadDraftFromConfig();
       if (limitePanel) limitePanel.hidden = false;
     });
   }
+
+  const btnHoraUp = document.getElementById('btnHoraUp');
+  const btnHoraDown = document.getElementById('btnHoraDown');
+  const btnMinUp = document.getElementById('btnMinUp');
+  const btnMinDown = document.getElementById('btnMinDown');
+  if (btnHoraUp) {
+    btnHoraUp.addEventListener('click', (e) => {
+      e.stopPropagation();
+      draftHora = (draftHora + 1) % 24;
+      syncLimiteUI();
+    });
+  }
+  if (btnHoraDown) {
+    btnHoraDown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      draftHora = (draftHora + 23) % 24;
+      syncLimiteUI();
+    });
+  }
+  if (btnMinUp) {
+    btnMinUp.addEventListener('click', (e) => {
+      e.stopPropagation();
+      draftMin = (draftMin + 5) % 60;
+      syncLimiteUI();
+    });
+  }
+  if (btnMinDown) {
+    btnMinDown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      draftMin = (draftMin + 55) % 60;
+      syncLimiteUI();
+    });
+  }
+
+  const limitePresets = document.getElementById('limitePresets');
+  if (limitePresets) {
+    limitePresets.addEventListener('click', (e) => {
+      const chip = e.target.closest('.limite-chip');
+      if (!chip) return;
+      e.stopPropagation();
+      const v = chip.getAttribute('data-hora') || '22:00';
+      const parts = v.split(':');
+      draftHora = Number(parts[0]) || 0;
+      draftMin = Number(parts[1]) || 0;
+      syncLimiteUI();
+    });
+  }
+
   const btnSaveLimite = document.getElementById('btnSaveLimite');
   if (btnSaveLimite) {
     btnSaveLimite.addEventListener('click', () => {
-      const input = document.getElementById('inputLimiteHora');
-      const val = (input && input.value) || '';
+      const val = pad2(draftHora) + ':' + pad2(draftMin);
       setLimiteHora(val);
-      // Actualizar sesiones libres activas con la nueva hora
       const hasta = computeLimiteHasta(val);
       equipos.forEach((eq) => {
         if (eq.estado === 'libre') {
@@ -421,8 +498,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       saveState();
-      const input = document.getElementById('inputLimiteHora');
-      if (input) input.value = '';
+      draftHora = 22;
+      draftMin = 0;
+      syncLimiteUI();
+      const hidden = document.getElementById('inputLimiteHora');
+      if (hidden) hidden.value = '';
       if (limitePanel) limitePanel.hidden = true;
       refresh();
     });

@@ -29,18 +29,20 @@ export function renderStatusCards(container) {
   container.innerHTML =
     '<div class="status-cards-grid">' +
     statusCard('vencidos', 'warning-outline', 'Vencidos', vencidos, vencidos > 0) +
-    statusCard('pausa', 'pause-circle-outline', 'En pausa', pausa, false) +
+    statusCard('pausa', 'pause-circle-outline', 'En pausa', pausa, pausa > 0) +
     statusCard('activos', 'play-circle-outline', 'Activos', activos, false) +
     statusCard('inactivos', 'ellipse-outline', 'Inactivos', inactivos, false) +
     '</div>';
 }
 
 function statusCard(key, icon, label, count, pulse) {
+  const hasItems =
+    (key === 'vencidos' || key === 'pausa') && count > 0 ? ' has-items' : '';
   return (
     '<div class="status-card status-card--' +
     key +
     (pulse ? ' is-pulse' : '') +
-    (count > 0 && key === 'vencidos' ? ' has-items' : '') +
+    hasItems +
     '">' +
     '<ion-icon name="' +
     icon +

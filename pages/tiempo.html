@@ -117,11 +117,37 @@
   <div class="price-panel limite-panel" id="limitePanel" hidden>
     <div class="price-panel-inner">
       <span class="price-label">Límite tiempo libre</span>
-      <p class="limite-hint">Las sesiones libres avisan al llegar a esta hora (reloj del sistema).</p>
-      <div class="price-fields">
-        <label class="modal-label" for="inputLimiteHora">Hasta las</label>
-        <input type="time" id="inputLimiteHora" class="price-input limite-hora-input">
+      <p class="limite-hint">Las sesiones libres avisan al llegar a esta hora.</p>
+
+      <div class="limite-presets" id="limitePresets">
+        <button type="button" class="limite-chip" data-hora="20:00">20:00</button>
+        <button type="button" class="limite-chip" data-hora="21:00">21:00</button>
+        <button type="button" class="limite-chip" data-hora="22:00">22:00</button>
+        <button type="button" class="limite-chip" data-hora="23:00">23:00</button>
+        <button type="button" class="limite-chip" data-hora="00:00">00:00</button>
       </div>
+
+      <div class="limite-steppers">
+        <div class="limite-stepper">
+          <button type="button" class="limite-step-btn" id="btnHoraDown" title="Bajar hora">−</button>
+          <div class="limite-step-value">
+            <span id="limiteHoraDisplay">22</span>
+            <small>hora</small>
+          </div>
+          <button type="button" class="limite-step-btn" id="btnHoraUp" title="Subir hora">+</button>
+        </div>
+        <span class="limite-colon">:</span>
+        <div class="limite-stepper">
+          <button type="button" class="limite-step-btn" id="btnMinDown" title="Bajar minutos">−</button>
+          <div class="limite-step-value">
+            <span id="limiteMinDisplay">00</span>
+            <small>min</small>
+          </div>
+          <button type="button" class="limite-step-btn" id="btnMinUp" title="Subir minutos">+</button>
+        </div>
+      </div>
+      <input type="hidden" id="inputLimiteHora" value="">
+
       <div class="limite-actions">
         <button class="btn-price-save" id="btnClearLimite" type="button">Sin límite</button>
         <button class="btn-price-save" id="btnSaveLimite" type="button">Guardar</button>
