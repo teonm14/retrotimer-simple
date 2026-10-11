@@ -74,6 +74,27 @@
             </button>
           </div>
         </div>
+        <div class="historial-filters" id="historialFilters">
+          <input type="search" id="histSearch" class="hist-filter-input" placeholder="Buscar nombre o notas..." autocomplete="off">
+          <div class="hist-filter-row">
+            <select id="histTipo" class="hist-filter-select" title="Tipo">
+              <option value="">Tipo: todos</option>
+              <option value="PC">PC</option>
+              <option value="XBOX">XBOX</option>
+              <option value="PLAYSTATION">PLAYSTATION</option>
+            </select>
+            <select id="histFecha" class="hist-filter-select" title="Fecha">
+              <option value="">Fecha: todas</option>
+              <option value="hoy">Hoy</option>
+              <option value="ayer">Ayer</option>
+              <option value="7d">Últimos 7 días</option>
+            </select>
+          </div>
+          <div class="hist-filter-row">
+            <input type="number" id="histMontoMin" class="hist-filter-input hist-filter-num" min="0" step="1" placeholder="Monto min $">
+            <input type="number" id="histMontoMax" class="hist-filter-input hist-filter-num" min="0" step="1" placeholder="Monto max $">
+          </div>
+        </div>
         <div class="historial-list" id="historialList"></div>
       </aside>
     </div>
@@ -218,14 +239,36 @@
   </div>
 
   <div class="modal-overlay" id="modalTiempo" hidden>
-    <div class="modal">
+    <div class="modal modal-tiempo">
       <h3 class="modal-title" id="modalTiempoTitle">Tiempo Definido</h3>
-      <div class="modal-body modal-body-row">
-        <input type="number" id="inputTiempoValor" class="modal-input modal-input-num" min="0" value="0">
-        <select id="inputTiempoUnidad" class="modal-select modal-select-sm">
-          <option value="minutos">Minutos</option>
-          <option value="horas">Horas</option>
-        </select>
+      <div class="modal-body">
+        <div class="limite-presets tiempo-presets" id="tiempoPresets">
+          <button type="button" class="limite-chip" data-mins="15">15 min</button>
+          <button type="button" class="limite-chip" data-mins="30">30 min</button>
+          <button type="button" class="limite-chip" data-mins="60">1 h</button>
+          <button type="button" class="limite-chip" data-mins="120">2 h</button>
+          <button type="button" class="limite-chip" data-mins="180">3 h</button>
+        </div>
+        <div class="limite-steppers">
+          <div class="limite-stepper">
+            <button type="button" class="limite-step-btn" id="btnTiempoHoraDown" title="Bajar horas">−</button>
+            <div class="limite-step-value">
+              <span id="tiempoHoraDisplay">0</span>
+              <small>horas</small>
+            </div>
+            <button type="button" class="limite-step-btn" id="btnTiempoHoraUp" title="Subir horas">+</button>
+          </div>
+          <span class="limite-colon">:</span>
+          <div class="limite-stepper">
+            <button type="button" class="limite-step-btn" id="btnTiempoMinDown" title="Bajar minutos">−</button>
+            <div class="limite-step-value">
+              <span id="tiempoMinDisplay">30</span>
+              <small>min</small>
+            </div>
+            <button type="button" class="limite-step-btn" id="btnTiempoMinUp" title="Subir minutos">+</button>
+          </div>
+        </div>
+        <p class="tiempo-total-hint" id="tiempoTotalHint">Total: 30 min</p>
       </div>
       <div class="modal-actions">
         <button class="modal-btn modal-btn-cancel" id="btnCancelarTiempo" type="button">Cancelar</button>

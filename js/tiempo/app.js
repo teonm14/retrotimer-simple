@@ -173,9 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'definido') {
       currentTiempoAction = 'definido';
       document.getElementById('modalTiempoTitle').textContent = 'Tiempo Definido';
-      document.getElementById('inputTiempoValor').value = '0';
-      document.getElementById('inputTiempoUnidad').value = 'minutos';
-      openModal(modalTiempo);
+      openTiempoModal(0, 30);
     }
 
     if (action === 'libre') {
@@ -197,17 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'agregar') {
       currentTiempoAction = 'agregar';
       document.getElementById('modalTiempoTitle').textContent = 'Agregar Tiempo';
-      document.getElementById('inputTiempoValor').value = '0';
-      document.getElementById('inputTiempoUnidad').value = 'minutos';
-      openModal(modalTiempo);
+      openTiempoModal(0, 15);
     }
 
     if (action === 'restar') {
       currentTiempoAction = 'restar';
       document.getElementById('modalTiempoTitle').textContent = 'Restar del tiempo usado';
-      document.getElementById('inputTiempoValor').value = '0';
-      document.getElementById('inputTiempoUnidad').value = 'minutos';
-      openModal(modalTiempo);
+      openTiempoModal(0, 5);
     }
 
     if (action === 'pause') {
@@ -268,11 +262,100 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ----- Modal tiempo ----- */
+  /* ----- Modal tiempo (steppers horas / minutos) ----- */
+  let draftTiempoH = 0;
+  let draftTiempoM = 30;
+
+  function pad2t(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function syncTiempoUI() {
+    const hEl = document.getElementById('tiempoHoraDisplay');
+    const mEl = document.getElementById('tiempoMinDisplay');
+    const hint = document.getElementById('tiempoTotalHint');
+    if (hEl) hEl.textContent = String(draftTiempoH);
+    if (mEl) mEl.textContent = pad2t(draftTiempoM);
+    const totalMin = draftTiempoH * 60 + draftTiempoM;
+    if (hint) {
+      if (totalMin < 60) hint.textContent = 'Total: ' + totalMin + ' min';
+      else {
+        const h = Math.floor(totalMin / 60);
+        const m = totalMin % 60;
+        hint.textContent = 'Total: ' + h + ' h' + (m ? ' ' + m + ' min' : '');
+      }
+    }
+    document.querySelectorAll('#tiempoPresets .limite-chip').forEach((chip) => {
+      const mins = Number(chip.getAttribute('data-mins'));
+      chip.classList.toggle('is-active', mins === totalMin);
+    });
+  }
+
+  function openTiempoModal(h, m) {
+    draftTiempoH = h || 0;
+    draftTiempoM = m || 0;
+    syncTiempoUI();
+    openModal(modalTiempo);
+  }
+
+  function getTiempoSegundos() {
+    return draftTiempoH * 3600 + draftTiempoM * 60;
+  }
+
+  const btnTHUp = document.getElementById('btnTiempoHoraUp');
+  const btnTHDown = document.getElementById('btnTiempoHoraDown');
+  const btnTMUp = document.getElementById('btnTiempoMinUp');
+  const btnTMDown = document.getElementById('btnTiempoMinDown');
+  if (btnTHUp) {
+    btnTHUp.addEventListener('click', () => {
+      draftTiempoH = Math.min(24, draftTiempoH + 1);
+      syncTiempoUI();
+    });
+  }
+  if (btnTHDown) {
+    btnTHDown.addEventListener('click', () => {
+      draftTiempoH = Math.max(0, draftTiempoH - 1);
+      syncTiempoUI();
+    });
+  }
+  if (btnTMUp) {
+    btnTMUp.addEventListener('click', () => {
+      draftTiempoM += 5;
+      if (draftTiempoM >= 60) {
+        draftTiempoM = 0;
+        draftTiempoH = Math.min(24, draftTiempoH + 1);
+      }
+      syncTiempoUI();
+    });
+  }
+  if (btnTMDown) {
+    btnTMDown.addEventListener('click', () => {
+      draftTiempoM -= 5;
+      if (draftTiempoM < 0) {
+        if (draftTiempoH > 0) {
+          draftTiempoH -= 1;
+          draftTiempoM = 55;
+        } else {
+          draftTiempoM = 0;
+        }
+      }
+      syncTiempoUI();
+    });
+  }
+  const tiempoPresets = document.getElementById('tiempoPresets');
+  if (tiempoPresets) {
+    tiempoPresets.addEventListener('click', (e) => {
+      const chip = e.target.closest('.limite-chip');
+      if (!chip) return;
+      const mins = Number(chip.getAttribute('data-mins')) || 0;
+      draftTiempoH = Math.floor(mins / 60);
+      draftTiempoM = mins % 60;
+      syncTiempoUI();
+    });
+  }
+
   document.getElementById('btnAceptarTiempo').addEventListener('click', () => {
-    const valor = document.getElementById('inputTiempoValor').value;
-    const unidad = document.getElementById('inputTiempoUnidad').value;
-    const segs = toSeconds(valor, unidad);
+    const segs = getTiempoSegundos();
     const eq = equipos.find((x) => x.id === currentEquipoId);
     if (!eq) return;
 
@@ -662,6 +745,18 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       document.getElementById('btnConfirmSi').click();
     }
+  });
+
+
+  /* ----- Filtros historial ----- */
+  function refreshHistorial() {
+    renderHistorial(historialList);
+  }
+  ['histSearch', 'histTipo', 'histFecha', 'histMontoMin', 'histMontoMax'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const evt = id === 'histSearch' || id === 'histMontoMin' || id === 'histMontoMax' ? 'input' : 'change';
+    el.addEventListener(evt, refreshHistorial);
   });
 
   refresh();

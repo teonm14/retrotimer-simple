@@ -4,37 +4,37 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const NOTIF_VERSION = '2026-10-08-v3';
+  const NOTIF_VERSION = '2026-10-11-v4';
 
   const NOVEDADES = [
     {
       type: 'feature',
-      text: 'Alertas claras al vencer el tiempo: fila en rojo, badge y banner de equipos vencidos.',
+      text: 'Selector de tiempo con atajos (15 min, 30 min, 1–3 h) y botones +/− para horas y minutos.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Ticket de cobro en pantalla con opción de imprimir (equipo, tiempo, total, hora).',
+      text: 'Historial con filtros: búsqueda por nombre/notas, tipo, fecha y rango de monto.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Deshacer el último cobro durante 20 segundos y recuperar la sesión del equipo.',
+      text: 'Tarjetas de estado permanentes: vencidos, en pausa, activos e inactivos (con pulso).',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Atajos de teclado: N (nuevo equipo), C (cobrar), Enter (confirmar).',
+      text: 'Límite de tiempo libre por hora del día (panel de herramientas), sin pedirlo al iniciar.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Código del gestor de tiempo organizado en módulos (más fácil de mantener).',
+      text: 'Alarma más notoria al vencer el tiempo; restar tiempo también en modo definido.',
       date: 'Oct 2026'
     },
     {
-      type: 'fix',
-      text: 'Mejor foco visible en botones e inputs para navegación con teclado.',
+      type: 'feature',
+      text: 'Ticket de cobro imprimible y deshacer cobro restaurando la sesión (20 s).',
       date: 'Oct 2026'
     }
   ];
