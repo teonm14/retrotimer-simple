@@ -10,7 +10,10 @@ import {
   setEquipos,
   priceConfig,
   setPriceConfig,
-  historial
+  historial,
+  limiteHora,
+  setLimiteHora,
+  computeLimiteHasta
 } from './state.js';
 import { getTranscurrido, tickOnce } from './timers.js';
 import { renderEquipos, renderVencidos, updateTimersUI } from './render.js';
@@ -123,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         limiteTotal: 0,
         startTimestamp: null,
         sessionStart: null,
+        limiteHasta: null,
         pausedAccum: 0,
         pausado: false,
         notas: '',
@@ -175,11 +179,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (action === 'libre') {
-      currentTiempoAction = 'limite';
-      document.getElementById('modalTiempoTitle').textContent = 'Establecer límite';
-      document.getElementById('inputTiempoValor').value = '0';
-      document.getElementById('inputTiempoUnidad').value = 'horas';
-      openModal(modalTiempo);
+      // Inicia sin modal; el límite es "hasta hora" del panel de herramientas
+      const t = Date.now();
+      eq.estado = 'libre';
+      eq.tiempoTranscurrido = 0;
+      eq.pausedAccum = 0;
+      eq.pausado = false;
+      eq.alerted = false;
+      eq.startTimestamp = t;
+      eq.sessionStart = t;
+      eq.limiteTotal = 0;
+      eq.limiteHasta = computeLimiteHasta(limiteHora);
+      saveState();
+      refresh();
     }
 
     if (action === 'agregar') {
@@ -235,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eq.tiempoTotal = 0;
         eq.tiempoTranscurrido = 0;
         eq.limiteTotal = 0;
+        eq.limiteHasta = null;
         eq.startTimestamp = null;
         eq.sessionStart = null;
         eq.pausedAccum = 0;
@@ -284,25 +297,20 @@ document.addEventListener('DOMContentLoaded', () => {
       eq.alerted = false;
     }
 
-    if (currentTiempoAction === 'limite') {
-      eq.estado = 'libre';
-      eq.limiteTotal = segs;
-      eq.tiempoTranscurrido = 0;
-      eq.pausedAccum = 0;
-      eq.pausado = false;
-      eq.alerted = false;
-      const t = Date.now();
-      eq.startTimestamp = t;
-      eq.sessionStart = t;
-    }
-
     if (currentTiempoAction === 'restar') {
+      // Resta del tiempo transcurrido (definido y libre)
       if (segs <= 0) return;
       const actual = getTranscurrido(eq);
       const nuevo = Math.max(0, actual - segs);
       eq.tiempoTranscurrido = nuevo;
       eq.pausedAccum = nuevo;
       if (!eq.pausado) eq.startTimestamp = Date.now();
+      if (eq.estado === 'definido' && eq.tiempoTranscurrido < eq.tiempoTotal) {
+        eq.alerted = false;
+      }
+      if (eq.estado === 'libre' && eq.limiteHasta && Date.now() < eq.limiteHasta) {
+        eq.alerted = false;
+      }
     }
 
     saveState();
@@ -330,6 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeTools() {
     if (toolsMenu) toolsMenu.hidden = true;
     if (pricePanel) pricePanel.hidden = true;
+    const limPanel = document.getElementById('limitePanel');
+    if (limPanel) limPanel.hidden = true;
   }
 
   function loadPriceUI() {
@@ -370,6 +380,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const limitePanel = document.getElementById('limitePanel');
+  const btnMenuLimite = document.getElementById('btnMenuLimite');
+  if (btnMenuLimite) {
+    btnMenuLimite.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toolsMenu.hidden = true;
+      const input = document.getElementById('inputLimiteHora');
+      if (input) input.value = limiteHora || '';
+      if (limitePanel) limitePanel.hidden = false;
+    });
+  }
+  const btnSaveLimite = document.getElementById('btnSaveLimite');
+  if (btnSaveLimite) {
+    btnSaveLimite.addEventListener('click', () => {
+      const input = document.getElementById('inputLimiteHora');
+      const val = (input && input.value) || '';
+      setLimiteHora(val);
+      // Actualizar sesiones libres activas con la nueva hora
+      const hasta = computeLimiteHasta(val);
+      equipos.forEach((eq) => {
+        if (eq.estado === 'libre') {
+          eq.limiteHasta = hasta;
+          if (hasta && Date.now() < hasta) eq.alerted = false;
+        }
+      });
+      saveState();
+      if (limitePanel) limitePanel.hidden = true;
+      refresh();
+    });
+  }
+  const btnClearLimite = document.getElementById('btnClearLimite');
+  if (btnClearLimite) {
+    btnClearLimite.addEventListener('click', () => {
+      setLimiteHora('');
+      equipos.forEach((eq) => {
+        if (eq.estado === 'libre') {
+          eq.limiteHasta = null;
+          eq.alerted = false;
+        }
+      });
+      saveState();
+      const input = document.getElementById('inputLimiteHora');
+      if (input) input.value = '';
+      if (limitePanel) limitePanel.hidden = true;
+      refresh();
+    });
+  }
+
   document.getElementById('btnSavePrice').addEventListener('click', () => {
     setPriceConfig({
       amount: Number(document.getElementById('priceAmount').value) || 0,
@@ -398,6 +456,16 @@ document.addEventListener('DOMContentLoaded', () => {
       !(fabConfig && fabConfig.contains(e.target))
     ) {
       pricePanel.hidden = true;
+    }
+    const limP = document.getElementById('limitePanel');
+    if (
+      limP &&
+      !limP.hidden &&
+      !limP.contains(e.target) &&
+      e.target !== fabConfig &&
+      !(fabConfig && fabConfig.contains(e.target))
+    ) {
+      limP.hidden = true;
     }
   });
 

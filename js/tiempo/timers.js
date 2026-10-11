@@ -12,25 +12,30 @@ export function getTranscurrido(eq) {
   return live;
 }
 
-/** Límite por reloj de pared — no se afecta por pausa ni restar */
+/**
+ * Límite restante en libre: hasta hora fija (limiteHasta).
+ * No se afecta por pausa ni restar del transcurrido.
+ */
 export function getLimiteRestante(eq) {
-  if (!eq.sessionStart || !eq.limiteTotal) return eq.limiteTotal || 0;
-  const wall = Math.floor((Date.now() - eq.sessionStart) / 1000);
-  return Math.max(0, eq.limiteTotal - wall);
+  if (!eq.limiteHasta) return null;
+  return Math.max(0, Math.floor((eq.limiteHasta - Date.now()) / 1000));
 }
 
-export function getWallElapsed(eq) {
-  if (!eq.sessionStart) return 0;
-  return Math.floor((Date.now() - eq.sessionStart) / 1000);
+/** Porcentaje restante del límite (0–100) o null si no hay límite */
+export function getLimitePct(eq) {
+  if (!eq.limiteHasta || !eq.sessionStart) return null;
+  const total = eq.limiteHasta - eq.sessionStart;
+  if (total <= 0) return 0;
+  const rest = Math.max(0, eq.limiteHasta - Date.now());
+  return Math.min(100, (rest / total) * 100);
 }
 
-/** Equipo con tiempo agotado */
 export function isVencido(eq) {
   if (eq.estado === 'definido') {
     return getTranscurrido(eq) >= (eq.tiempoTotal || 0) && (eq.tiempoTotal || 0) > 0;
   }
-  if (eq.estado === 'libre' && (eq.limiteTotal || 0) > 0) {
-    return getWallElapsed(eq) >= eq.limiteTotal;
+  if (eq.estado === 'libre' && eq.limiteHasta) {
+    return Date.now() >= eq.limiteHasta;
   }
   return false;
 }
@@ -39,9 +44,31 @@ export function getVencidos() {
   return equipos.filter(isVencido);
 }
 
-/**
- * Avanza timers. Devuelve { needSave, justAlerted: ids[] }
- */
+export function getStatusCounts() {
+  let vencidos = 0;
+  let pausa = 0;
+  let activos = 0;
+  let inactivos = 0;
+
+  equipos.forEach((eq) => {
+    if (eq.estado === 'idle') {
+      inactivos++;
+      return;
+    }
+    if (eq.estado === 'definido' || eq.estado === 'libre') {
+      if (isVencido(eq)) {
+        vencidos++;
+      } else if (eq.pausado) {
+        pausa++;
+      } else {
+        activos++;
+      }
+    }
+  });
+
+  return { vencidos, pausa, activos, inactivos };
+}
+
 export function tickOnce() {
   let needSave = false;
   const justAlerted = [];
@@ -73,15 +100,12 @@ export function tickOnce() {
       }
     }
 
-    // Límite libre: alerta aunque esté pausado (reloj de pared)
-    if (eq.estado === 'libre' && eq.limiteTotal > 0 && eq.sessionStart) {
-      const wall = getWallElapsed(eq);
-      if (wall >= eq.limiteTotal && !eq.alerted) {
-        eq.alerted = true;
-        playFinishSound();
-        justAlerted.push(eq.id);
-        needSave = true;
-      }
+    // Límite libre por hora: alerta aunque esté pausado
+    if (eq.estado === 'libre' && eq.limiteHasta && now >= eq.limiteHasta && !eq.alerted) {
+      eq.alerted = true;
+      playFinishSound();
+      justAlerted.push(eq.id);
+      needSave = true;
     }
   });
 

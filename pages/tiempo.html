@@ -44,8 +44,8 @@
           </button>
         </div>
 
-        <!-- Banner equipos vencidos -->
-        <div class="vencidos-banner" id="vencidosBanner" hidden></div>
+        <!-- Tarjetas de estado (permanentes) -->
+        <div class="status-cards" id="vencidosBanner"></div>
 
         <div class="equipos-header">
           <span class="equipos-title">Equipos</span>
@@ -88,6 +88,10 @@
       <ion-icon name="cash-outline"></ion-icon>
       <span>Ajustar precio</span>
     </button>
+    <button class="tools-menu-item" id="btnMenuLimite" type="button">
+      <ion-icon name="alarm-outline"></ion-icon>
+      <span>Límite tiempo libre</span>
+    </button>
     <button class="tools-menu-item" id="btnMenuCalc" type="button">
       <ion-icon name="calculator-outline"></ion-icon>
       <span>Calculadora</span>
@@ -107,6 +111,21 @@
         </select>
       </div>
       <button class="btn-price-save" id="btnSavePrice">Guardar</button>
+    </div>
+  </div>
+
+  <div class="price-panel limite-panel" id="limitePanel" hidden>
+    <div class="price-panel-inner">
+      <span class="price-label">Límite tiempo libre</span>
+      <p class="limite-hint">Las sesiones libres avisan al llegar a esta hora (reloj del sistema).</p>
+      <div class="price-fields">
+        <label class="modal-label" for="inputLimiteHora">Hasta las</label>
+        <input type="time" id="inputLimiteHora" class="price-input limite-hora-input">
+      </div>
+      <div class="limite-actions">
+        <button class="btn-price-save" id="btnClearLimite" type="button">Sin límite</button>
+        <button class="btn-price-save" id="btnSaveLimite" type="button">Guardar</button>
+      </div>
     </div>
   </div>
 

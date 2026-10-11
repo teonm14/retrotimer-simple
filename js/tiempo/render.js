@@ -1,8 +1,14 @@
-/** Render de equipos, vencidos y timers UI */
+/** Render de equipos, tarjetas de estado y timers UI */
 
 import { equipos } from './state.js';
-import { getTranscurrido, getLimiteRestante, isVencido, getVencidos } from './timers.js';
-import { formatTime, iconName, iconClass, escapeHtml } from './utils.js';
+import {
+  getTranscurrido,
+  getLimiteRestante,
+  getLimitePct,
+  isVencido,
+  getStatusCounts
+} from './timers.js';
+import { formatTime, formatHoraCorta, iconName, iconClass, escapeHtml } from './utils.js';
 
 function autoResizeNotas(el) {
   if (!el) return;
@@ -11,27 +17,48 @@ function autoResizeNotas(el) {
   el.style.height = Math.min(el.scrollHeight, max) + 'px';
 }
 
-export function renderVencidos(container) {
+/**
+ * Tarjetas permanentes: Vencidos | En pausa | Activos | Inactivos
+ * Vencidos pulsa cuando count > 0
+ */
+export function renderStatusCards(container) {
   if (!container) return;
-  const list = getVencidos();
-  if (list.length === 0) {
-    container.hidden = true;
-    container.innerHTML = '';
-    return;
-  }
+  const { vencidos, pausa, activos, inactivos } = getStatusCounts();
+
   container.hidden = false;
   container.innerHTML =
-    '<div class="vencidos-inner">' +
-    '<ion-icon name="warning-outline" class="vencidos-icon"></ion-icon>' +
-    '<div class="vencidos-text">' +
-    '<strong>Equipos vencidos (' +
-    list.length +
-    ')</strong>' +
-    '<span>' +
-    list.map((eq) => escapeHtml(eq.nombre)).join(', ') +
-    '</span>' +
-    '</div>' +
+    '<div class="status-cards-grid">' +
+    statusCard('vencidos', 'warning-outline', 'Vencidos', vencidos, vencidos > 0) +
+    statusCard('pausa', 'pause-circle-outline', 'En pausa', pausa, false) +
+    statusCard('activos', 'play-circle-outline', 'Activos', activos, false) +
+    statusCard('inactivos', 'ellipse-outline', 'Inactivos', inactivos, false) +
     '</div>';
+}
+
+function statusCard(key, icon, label, count, pulse) {
+  return (
+    '<div class="status-card status-card--' +
+    key +
+    (pulse ? ' is-pulse' : '') +
+    (count > 0 && key === 'vencidos' ? ' has-items' : '') +
+    '">' +
+    '<ion-icon name="' +
+    icon +
+    '" class="status-card-icon"></ion-icon>' +
+    '<div class="status-card-body">' +
+    '<span class="status-card-count">' +
+    count +
+    '</span>' +
+    '<span class="status-card-label">' +
+    label +
+    '</span>' +
+    '</div></div>'
+  );
+}
+
+/** @deprecated alias — mantener por compatibilidad de imports */
+export function renderVencidos(container) {
+  renderStatusCards(container);
 }
 
 export function renderEquipos(equiposList) {
@@ -141,6 +168,7 @@ export function renderEquipos(equiposList) {
           pauseIcon +
           '-outline"></ion-icon></button>' +
           '<button class="btn-accion btn-agregar" data-action="agregar">+ Tiempo</button>' +
+          '<button class="btn-accion btn-restar" data-action="restar">− Tiempo</button>' +
           '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
           '<button class="btn-accion btn-editar" data-action="editar" title="Editar">' +
           '<ion-icon name="create-outline"></ion-icon></button>' +
@@ -156,8 +184,18 @@ export function renderEquipos(equiposList) {
       if (eq.estado === 'libre') {
         const trans2 = getTranscurrido(eq);
         const limRest = getLimiteRestante(eq);
-        const pct2 = eq.limiteTotal > 0 ? (limRest / eq.limiteTotal) * 100 : 100;
+        const pct2 = getLimitePct(eq);
         const pauseIcon2 = eq.pausado ? 'play' : 'pause';
+        let timeLabel = formatTime(trans2);
+        if (eq.limiteHasta) {
+          timeLabel +=
+            ' / Hasta ' +
+            formatHoraCorta(eq.limiteHasta) +
+            (limRest != null ? ' · ' + formatTime(limRest) : '');
+        } else {
+          timeLabel += ' / Sin límite';
+        }
+        const barW = pct2 == null ? 100 : pct2;
         return (
           '<div class="' +
           rowClass +
@@ -181,12 +219,10 @@ export function renderEquipos(equiposList) {
           '<div class="tiempo-info">' +
           '<div class="progress-wrap">' +
           '<div class="progress-bar" data-bar style="width:' +
-          pct2 +
+          barW +
           '%"></div>' +
           '<span class="progress-text" data-time>' +
-          formatTime(trans2) +
-          ' / Límite ' +
-          formatTime(limRest) +
+          timeLabel +
           '</span></div></div>' +
           '<div class="acciones-activas">' +
           '<button class="btn-accion btn-pause" data-action="pause" title="' +
@@ -264,9 +300,18 @@ export function updateTimersUI(equiposList) {
     if (eq.estado === 'libre') {
       const trans2 = getTranscurrido(eq);
       const limRest = getLimiteRestante(eq);
-      const pct2 = eq.limiteTotal > 0 ? (limRest / eq.limiteTotal) * 100 : 100;
-      bar.style.width = pct2 + '%';
-      text.textContent = formatTime(trans2) + ' / Límite ' + formatTime(limRest);
+      const pct2 = getLimitePct(eq);
+      bar.style.width = (pct2 == null ? 100 : pct2) + '%';
+      let label = formatTime(trans2);
+      if (eq.limiteHasta) {
+        label +=
+          ' / Hasta ' +
+          formatHoraCorta(eq.limiteHasta) +
+          (limRest != null ? ' · ' + formatTime(limRest) : '');
+      } else {
+        label += ' / Sin límite';
+      }
+      text.textContent = label;
     }
   });
 }

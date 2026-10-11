@@ -82,9 +82,10 @@ export function confirmarCobro() {
       tiempoTotal: eq.tiempoTotal || 0,
       tiempoTranscurrido: trans,
       limiteTotal: eq.limiteTotal || 0,
+      limiteHasta: eq.limiteHasta || null,
       sessionStart: eq.sessionStart,
       pausedAccum: trans,
-      pausado: true, // al restaurar queda en pausa para no saltar el reloj
+      pausado: true,
       notas: eq.notas || '',
       alerted: eq.alerted || false
     };
@@ -93,6 +94,7 @@ export function confirmarCobro() {
     eq.tiempoTotal = 0;
     eq.tiempoTranscurrido = 0;
     eq.limiteTotal = 0;
+    eq.limiteHasta = null;
     eq.startTimestamp = null;
     eq.sessionStart = null;
     eq.pausedAccum = 0;
@@ -174,6 +176,7 @@ export function undoLastCobro() {
       eq.tiempoTotal = snap.tiempoTotal;
       eq.tiempoTranscurrido = snap.tiempoTranscurrido;
       eq.limiteTotal = snap.limiteTotal;
+      eq.limiteHasta = snap.limiteHasta || null;
       eq.sessionStart = snap.sessionStart;
       eq.pausedAccum = snap.pausedAccum;
       eq.pausado = true;
