@@ -323,6 +323,31 @@ document.addEventListener('DOMContentLoaded', () => {
     return draftTiempoH * 3600 + draftTiempoM * 60;
   }
 
+  /** Segundos restantes hasta el límite de hora (null si no hay límite) */
+  function maxSegundosHastaLimite() {
+    if (!limiteHora) return null;
+    const hasta = computeLimiteHasta(limiteHora);
+    if (!hasta) return null;
+    return Math.max(0, Math.floor((hasta - Date.now()) / 1000));
+  }
+
+  function aplicarTopeLimite(segs) {
+    const max = maxSegundosHastaLimite();
+    if (max == null) return segs;
+    if (segs > max) {
+      const m = Math.floor(max / 60);
+      alert(
+        'No puedes asignar más tiempo del disponible hasta el límite (' +
+          limiteHora +
+          '). Máximo: ' +
+          m +
+          ' min.'
+      );
+      return max;
+    }
+    return segs;
+  }
+
   const btnTHUp = document.getElementById('btnTiempoHoraUp');
   const btnTHDown = document.getElementById('btnTiempoHoraDown');
   const btnTMUp = document.getElementById('btnTiempoMinUp');
@@ -376,11 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('btnAceptarTiempo').addEventListener('click', () => {
-    const segs = getTiempoSegundos();
+    let segs = getTiempoSegundos();
     const eq = equipos.find((x) => x.id === currentEquipoId);
     if (!eq) return;
 
     if (currentTiempoAction === 'definido') {
+      if (segs <= 0) return;
+      segs = aplicarTopeLimite(segs);
       if (segs <= 0) return;
       eq.estado = 'definido';
       eq.tiempoTotal = segs;
@@ -396,7 +423,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (segs <= 0) return;
       const trans = getTranscurrido(eq);
       const restanteActual = Math.max(0, (eq.tiempoTotal || 0) - trans);
-      eq.tiempoTotal = trans + restanteActual + segs;
+      let nuevoTotal = trans + restanteActual + segs;
+      const max = maxSegundosHastaLimite();
+      if (max != null) {
+        // No superar lo que cabe hasta la hora límite desde ahora (+ lo ya usado)
+        const tope = trans + max;
+        if (nuevoTotal > tope) {
+          alert(
+            'No puedes superar el límite de hora (' +
+              limiteHora +
+              '). Se ajustará al máximo permitido.'
+          );
+          nuevoTotal = tope;
+        }
+      }
+      eq.tiempoTotal = Math.max(nuevoTotal, trans);
       if (!eq.pausado && eq.startTimestamp) eq.tiempoTranscurrido = trans;
       eq.alerted = false;
     }
@@ -421,9 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Cambiar el tiempo total de la sesión definida
       if (segs <= 0) return;
       const trans = getTranscurrido(eq);
-      eq.tiempoTotal = Math.max(segs, trans); // no menor que lo ya usado
+      segs = aplicarTopeLimite(segs);
+      // Si el tope es menor que lo usado, al menos respetar lo usado
+      eq.tiempoTotal = Math.max(segs, trans);
       if (eq.tiempoTotal > trans) eq.alerted = false;
-      // congelar transcurrido actual
       eq.tiempoTranscurrido = trans;
       eq.pausedAccum = trans;
       if (!eq.pausado) eq.startTimestamp = Date.now();
@@ -431,6 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (currentTiempoAction === 'a-definido') {
       // Libre → Definido conservando progreso
+      if (segs <= 0) return;
+      segs = aplicarTopeLimite(segs);
       if (segs <= 0) return;
       const trans = getTranscurrido(eq);
       eq.estado = 'definido';
@@ -854,8 +898,12 @@ document.addEventListener('DOMContentLoaded', () => {
       to.tiempoTotal = from.tiempoTotal || 0;
       to.tiempoTranscurrido = trans;
       to.pausedAccum = trans;
-      to.pausado = true; // queda en pausa para revisar
-      to.startTimestamp = null;
+      to.pausado = !!from.pausado;
+      if (from.pausado) {
+        to.startTimestamp = null;
+      } else {
+        to.startTimestamp = Date.now();
+      }
       to.sessionStart = from.sessionStart;
       to.limiteTotal = from.limiteTotal || 0;
       to.limiteHasta = from.limiteHasta || null;

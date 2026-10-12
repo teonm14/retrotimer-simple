@@ -170,7 +170,7 @@ export function renderEquipos(equiposList) {
           pauseIcon +
           '-outline"></ion-icon></button>' +
           '<button class="btn-accion btn-agregar" data-action="agregar" title="Sumar al tiempo total">+ Tiempo</button>' +
-          '<button class="btn-accion btn-restar" data-action="restar" title="Descontar del tiempo usado (cobro)">− Usado</button>' +
+          '<button class="btn-accion btn-restar" data-action="restar" title="Descontar del tiempo usado">− Usado</button>' +
           '<button class="btn-accion btn-ajustar" data-action="ajustar" title="Cambiar el tiempo total de la sesión">Ajustar</button>' +
           '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
           '<button class="btn-accion btn-mover" data-action="mover" title="Mover sesión a otro equipo">' +
@@ -235,7 +235,7 @@ export function renderEquipos(equiposList) {
           '"><ion-icon name="' +
           pauseIcon2 +
           '-outline"></ion-icon></button>' +
-          '<button class="btn-accion btn-restar" data-action="restar" title="Descontar del tiempo usado (cobro)">− Usado</button>' +
+          '<button class="btn-accion btn-restar" data-action="restar" title="Descontar del tiempo usado">− Usado</button>' +
           '<button class="btn-accion btn-a-definido" data-action="a-definido" title="Pasar a tiempo definido sin perder progreso">→ Definido</button>' +
           '<button class="btn-accion btn-cobrar" data-action="cobrar">Cobrar</button>' +
           '<button class="btn-accion btn-mover" data-action="mover" title="Mover sesión a otro equipo">' +

@@ -282,6 +282,17 @@
       <h3 class="modal-title">Cobrar</h3>
       <div class="modal-body">
         <p class="cobrar-info" id="cobrarInfo">Tiempo utilizado: 00:00:00</p>
+        <div class="cobrar-modo-wrap" id="cobrarModoWrap" hidden>
+          <span class="modal-label">¿Cómo cobrar?</span>
+          <label class="cobrar-radio">
+            <input type="radio" name="cobrarModo" id="cobrarModoUsado" value="usado" checked>
+            Solo tiempo usado
+          </label>
+          <label class="cobrar-radio">
+            <input type="radio" name="cobrarModo" id="cobrarModoCompleto" value="completo">
+            Monto completo (todo el tiempo contratado)
+          </label>
+        </div>
         <p class="cobrar-base" id="cobrarBase">Tiempo: $0.00</p>
         <label class="modal-label">Extra (copias, abarrotes, etc.):</label>
         <div class="extra-row">
@@ -303,7 +314,7 @@
       <h3 class="modal-title">Mover sesión</h3>
       <div class="modal-body">
         <p class="confirm-text">Origen: <strong id="moverOrigenNombre">—</strong></p>
-        <p class="limite-hint">La sesión (tiempo, notas y modo) pasará al equipo destino. El origen quedará libre. La sesión se pausa al mover.</p>
+        <p class="limite-hint">La sesión (tiempo, notas y modo) pasará al equipo destino. El origen quedará libre. Si estaba corriendo, seguirá corriendo.</p>
         <label class="modal-label" for="selectMoverDestino">Equipo destino (inactivo)</label>
         <select id="selectMoverDestino" class="modal-select"></select>
       </div>

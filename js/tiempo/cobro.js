@@ -23,22 +23,64 @@ export function getCobrarContext() {
 
 export function openCobrarModal(eq) {
   const segundosUsados = getTranscurrido(eq);
-  const base = calcularPrecio(segundosUsados);
+  const segundosCompleto = eq.estado === 'definido' ? (eq.tiempoTotal || segundosUsados) : segundosUsados;
+  const baseUsado = calcularPrecio(segundosUsados);
+  const baseCompleto = calcularPrecio(segundosCompleto);
+
   cobrarContext = {
     id: eq.id,
+    segundosUsados,
+    segundosCompleto,
+    baseUsado,
+    baseCompleto,
     segundos: segundosUsados,
-    base,
+    base: baseUsado,
     modo: eq.estado,
     nombre: eq.nombre,
     tipo: eq.tipo,
-    notas: eq.notas || ''
+    notas: eq.notas || '',
+    tipoCobro: 'usado'
   };
+
   document.getElementById('cobrarInfo').textContent =
-    'Tiempo utilizado: ' + formatTime(segundosUsados);
-  document.getElementById('cobrarBase').textContent = 'Tiempo: $' + base.toFixed(2);
+    'Tiempo utilizado: ' + formatTime(segundosUsados) +
+    (eq.estado === 'definido'
+      ? ' · Contratado: ' + formatTime(segundosCompleto)
+      : '');
+
+  const modoWrap = document.getElementById('cobrarModoWrap');
+  const radioUsado = document.getElementById('cobrarModoUsado');
+  const radioCompleto = document.getElementById('cobrarModoCompleto');
+  if (modoWrap) {
+    if (eq.estado === 'definido') {
+      modoWrap.hidden = false;
+      if (radioUsado) radioUsado.checked = true;
+      if (radioCompleto) radioCompleto.checked = false;
+    } else {
+      modoWrap.hidden = true;
+    }
+  }
+
   document.getElementById('inputExtra').value = '0';
-  updateCobrarTotal();
+  applyTipoCobro('usado');
   openModal(document.getElementById('modalCobrar'));
+}
+
+function applyTipoCobro(tipo) {
+  if (!cobrarContext) return;
+  cobrarContext.tipoCobro = tipo;
+  if (tipo === 'completo') {
+    cobrarContext.segundos = cobrarContext.segundosCompleto;
+    cobrarContext.base = cobrarContext.baseCompleto;
+    document.getElementById('cobrarBase').textContent =
+      'Tiempo completo: $' + cobrarContext.base.toFixed(2);
+  } else {
+    cobrarContext.segundos = cobrarContext.segundosUsados;
+    cobrarContext.base = cobrarContext.baseUsado;
+    document.getElementById('cobrarBase').textContent =
+      'Tiempo usado: $' + cobrarContext.base.toFixed(2);
+  }
+  updateCobrarTotal();
 }
 
 export function updateCobrarTotal() {
@@ -65,6 +107,7 @@ export function confirmarCobro() {
     extra,
     total,
     notas: cobrarContext.notas,
+    tipoCobro: cobrarContext.tipoCobro || 'usado',
     fecha
   };
 
@@ -197,6 +240,19 @@ export function undoLastCobro() {
 export function initCobroUI() {
   const inputExtra = document.getElementById('inputExtra');
   if (inputExtra) inputExtra.addEventListener('input', updateCobrarTotal);
+
+  const radioUsado = document.getElementById('cobrarModoUsado');
+  const radioCompleto = document.getElementById('cobrarModoCompleto');
+  if (radioUsado) {
+    radioUsado.addEventListener('change', () => {
+      if (radioUsado.checked) applyTipoCobro('usado');
+    });
+  }
+  if (radioCompleto) {
+    radioCompleto.addEventListener('change', () => {
+      if (radioCompleto.checked) applyTipoCobro('completo');
+    });
+  }
 
   const btnConfirmar = document.getElementById('btnConfirmarCobrar');
   if (btnConfirmar) btnConfirmar.addEventListener('click', confirmarCobro);
