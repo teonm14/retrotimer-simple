@@ -200,8 +200,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (action === 'restar') {
       currentTiempoAction = 'restar';
-      document.getElementById('modalTiempoTitle').textContent = 'Restar del tiempo usado';
+      document.getElementById('modalTiempoTitle').textContent = 'Descontar tiempo usado';
       openTiempoModal(0, 5);
+    }
+
+    if (action === 'ajustar') {
+      currentTiempoAction = 'ajustar';
+      document.getElementById('modalTiempoTitle').textContent = 'Ajustar tiempo total';
+      const trans = getTranscurrido(eq);
+      const total = eq.tiempoTotal || 0;
+      // Prefill with current total
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      openTiempoModal(h, m - (m % 5)); // round down to 5
+    }
+
+    if (action === 'a-definido') {
+      currentTiempoAction = 'a-definido';
+      document.getElementById('modalTiempoTitle').textContent = 'Pasar a tiempo definido';
+      openTiempoModal(0, 30);
+    }
+
+    if (action === 'mover') {
+      openMoverModal(eq);
     }
 
     if (action === 'pause') {
@@ -381,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (currentTiempoAction === 'restar') {
-      // Resta del tiempo transcurrido (definido y libre)
+      // Descontar del tiempo usado / cobrable
       if (segs <= 0) return;
       const actual = getTranscurrido(eq);
       const nuevo = Math.max(0, actual - segs);
@@ -393,6 +414,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (eq.estado === 'libre' && eq.limiteHasta && Date.now() < eq.limiteHasta) {
         eq.alerted = false;
+      }
+    }
+
+    if (currentTiempoAction === 'ajustar') {
+      // Cambiar el tiempo total de la sesión definida
+      if (segs <= 0) return;
+      const trans = getTranscurrido(eq);
+      eq.tiempoTotal = Math.max(segs, trans); // no menor que lo ya usado
+      if (eq.tiempoTotal > trans) eq.alerted = false;
+      // congelar transcurrido actual
+      eq.tiempoTranscurrido = trans;
+      eq.pausedAccum = trans;
+      if (!eq.pausado) eq.startTimestamp = Date.now();
+    }
+
+    if (currentTiempoAction === 'a-definido') {
+      // Libre → Definido conservando progreso
+      if (segs <= 0) return;
+      const trans = getTranscurrido(eq);
+      eq.estado = 'definido';
+      eq.tiempoTotal = Math.max(segs, trans);
+      eq.tiempoTranscurrido = trans;
+      eq.pausedAccum = trans;
+      eq.limiteTotal = 0;
+      eq.limiteHasta = null;
+      eq.sessionStart = null;
+      eq.alerted = false;
+      if (eq.pausado) {
+        eq.startTimestamp = null;
+      } else {
+        eq.startTimestamp = Date.now();
       }
     }
 
@@ -747,6 +799,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+
+
+  /* ----- Mover sesión a otro equipo ----- */
+  const modalMover = document.getElementById('modalMover');
+  let moverFromId = null;
+
+  function openMoverModal(eq) {
+    moverFromId = eq.id;
+    const sel = document.getElementById('selectMoverDestino');
+    if (!sel) return;
+    const candidatos = equipos.filter(
+      (x) => x.id !== eq.id && x.estado === 'idle'
+    );
+    if (candidatos.length === 0) {
+      document.getElementById('confirmTitle').textContent = 'No hay destino';
+      document.getElementById('confirmText').textContent =
+        'Necesitas otro equipo inactivo para mover la sesión.';
+      confirmCallback = null;
+      openModal(modalConfirm);
+      return;
+    }
+    sel.innerHTML = candidatos
+      .map(
+        (x) =>
+          '<option value="' +
+          x.id +
+          '">' +
+          x.nombre +
+          ' (' +
+          x.tipo +
+          ')</option>'
+      )
+      .join('');
+    document.getElementById('moverOrigenNombre').textContent =
+      eq.nombre + ' (' + eq.tipo + ')';
+    openModal(modalMover);
+  }
+
+  const btnConfirmarMover = document.getElementById('btnConfirmarMover');
+  if (btnConfirmarMover) {
+    btnConfirmarMover.addEventListener('click', () => {
+      const sel = document.getElementById('selectMoverDestino');
+      if (!sel || moverFromId == null) return;
+      const destId = Number(sel.value);
+      const from = equipos.find((x) => x.id === moverFromId);
+      const to = equipos.find((x) => x.id === destId);
+      if (!from || !to || to.estado !== 'idle') return;
+
+      // Congelar tiempo usado en origen antes de copiar
+      const trans = getTranscurrido(from);
+
+      to.estado = from.estado;
+      to.tiempoTotal = from.tiempoTotal || 0;
+      to.tiempoTranscurrido = trans;
+      to.pausedAccum = trans;
+      to.pausado = true; // queda en pausa para revisar
+      to.startTimestamp = null;
+      to.sessionStart = from.sessionStart;
+      to.limiteTotal = from.limiteTotal || 0;
+      to.limiteHasta = from.limiteHasta || null;
+      to.alerted = from.alerted || false;
+      to.notas = from.notas || '';
+
+      // Limpiar origen
+      from.estado = 'idle';
+      from.tiempoTotal = 0;
+      from.tiempoTranscurrido = 0;
+      from.limiteTotal = 0;
+      from.limiteHasta = null;
+      from.startTimestamp = null;
+      from.sessionStart = null;
+      from.pausedAccum = 0;
+      from.pausado = false;
+      from.alerted = false;
+      from.notas = '';
+
+      moverFromId = null;
+      saveState();
+      closeModal(modalMover);
+      refresh();
+    });
+  }
+  const btnCancelarMover = document.getElementById('btnCancelarMover');
+  if (btnCancelarMover) {
+    btnCancelarMover.addEventListener('click', () => {
+      moverFromId = null;
+      closeModal(modalMover);
+    });
+  }
 
   /* ----- Filtros historial ----- */
   function refreshHistorial() {

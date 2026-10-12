@@ -1516,3 +1516,23 @@
 .tiempo-presets {
   margin-bottom: 0.55rem;
 }
+
+
+.btn-ajustar,
+.btn-a-definido {
+  background: #37474f;
+}
+.btn-ajustar:hover,
+.btn-a-definido:hover {
+  background: #455a64;
+}
+.btn-mover {
+  background: transparent;
+  border: 1px solid #555;
+  min-width: 36px;
+  padding: 0.35rem 0.45rem;
+}
+.btn-mover:hover {
+  border-color: #00bcd4;
+  color: #00bcd4;
+}

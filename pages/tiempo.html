@@ -297,6 +297,23 @@
     </div>
   </div>
 
+
+  <div class="modal-overlay" id="modalMover" hidden>
+    <div class="modal">
+      <h3 class="modal-title">Mover sesión</h3>
+      <div class="modal-body">
+        <p class="confirm-text">Origen: <strong id="moverOrigenNombre">—</strong></p>
+        <p class="limite-hint">La sesión (tiempo, notas y modo) pasará al equipo destino. El origen quedará libre. La sesión se pausa al mover.</p>
+        <label class="modal-label" for="selectMoverDestino">Equipo destino (inactivo)</label>
+        <select id="selectMoverDestino" class="modal-select"></select>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="btnCancelarMover" type="button">Cancelar</button>
+        <button class="modal-btn" id="btnConfirmarMover" type="button">Mover</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalConfirm" hidden>
     <div class="modal">
       <h3 class="modal-title" id="confirmTitle">¿Estás seguro?</h3>
