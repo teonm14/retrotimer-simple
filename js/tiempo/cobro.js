@@ -1,6 +1,6 @@
 /** Cobro, ticket e deshacer */
 
-import { equipos, historial, calcularPrecio, saveState } from './state.js';
+import { equipos, historial, calcularPrecio, roundMoney, saveState } from './state.js';
 import { getTranscurrido } from './timers.js';
 import { formatTime, formatFechaLarga, openModal, closeModal } from './utils.js';
 import { removeHistorialById } from './historial.js';
@@ -85,15 +85,15 @@ function applyTipoCobro(tipo) {
 
 export function updateCobrarTotal() {
   if (!cobrarContext) return;
-  const extra = Number(document.getElementById('inputExtra').value) || 0;
+  const extra = roundMoney(Number(document.getElementById('inputExtra').value) || 0);
   document.getElementById('cobrarTotal').textContent =
-    'Total a cobrar: $' + (cobrarContext.base + extra).toFixed(2);
+    'Total a cobrar: $' + roundMoney(cobrarContext.base + extra).toFixed(2);
 }
 
 export function confirmarCobro() {
   if (!cobrarContext) return;
-  const extra = Number(document.getElementById('inputExtra').value) || 0;
-  const total = cobrarContext.base + extra;
+  const extra = roundMoney(Number(document.getElementById('inputExtra').value) || 0);
+  const total = roundMoney(cobrarContext.base + extra);
   const fecha = Date.now();
   const historialId = fecha;
 
@@ -251,6 +251,29 @@ export function initCobroUI() {
   if (radioCompleto) {
     radioCompleto.addEventListener('change', () => {
       if (radioCompleto.checked) applyTipoCobro('completo');
+    });
+  }
+
+  const btnExtraUp = document.getElementById('btnExtraUp');
+  const btnExtraDown = document.getElementById('btnExtraDown');
+  if (btnExtraUp && inputExtra) {
+    btnExtraUp.addEventListener('click', () => {
+      const v = roundMoney((Number(inputExtra.value) || 0) + 0.5);
+      inputExtra.value = String(v);
+      updateCobrarTotal();
+    });
+  }
+  if (btnExtraDown && inputExtra) {
+    btnExtraDown.addEventListener('click', () => {
+      const v = Math.max(0, roundMoney((Number(inputExtra.value) || 0) - 0.5));
+      inputExtra.value = String(v);
+      updateCobrarTotal();
+    });
+  }
+  if (inputExtra) {
+    inputExtra.addEventListener('change', () => {
+      inputExtra.value = String(Math.max(0, roundMoney(Number(inputExtra.value) || 0)));
+      updateCobrarTotal();
     });
   }
 

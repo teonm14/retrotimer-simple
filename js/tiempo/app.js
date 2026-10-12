@@ -291,12 +291,49 @@ document.addEventListener('DOMContentLoaded', () => {
     return String(n).padStart(2, '0');
   }
 
+  function formatDuracionHumana(segs) {
+    segs = Math.max(0, Math.floor(segs));
+    const h = Math.floor(segs / 3600);
+    const m = Math.floor((segs % 3600) / 60);
+    if (h > 0 && m > 0) return h + ' h ' + m + ' min';
+    if (h > 0) return h + ' h';
+    return m + ' min';
+  }
+
+  function showAppToast(msg) {
+    const toast = document.getElementById('appToast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.hidden = false;
+    toast.classList.add('visible');
+    clearTimeout(showAppToast._t);
+    showAppToast._t = setTimeout(() => {
+      toast.classList.remove('visible');
+      toast.hidden = true;
+    }, 4500);
+  }
+
+  function clearLimiteMsg() {
+    const msg = document.getElementById('tiempoLimiteMsg');
+    if (msg) {
+      msg.hidden = true;
+      msg.textContent = '';
+    }
+  }
+
+  function showLimiteMsg(text) {
+    const msg = document.getElementById('tiempoLimiteMsg');
+    if (!msg) return;
+    msg.textContent = text;
+    msg.hidden = false;
+  }
+
   function syncTiempoUI() {
     const hEl = document.getElementById('tiempoHoraDisplay');
     const mEl = document.getElementById('tiempoMinDisplay');
     const hint = document.getElementById('tiempoTotalHint');
-    if (hEl) hEl.textContent = String(draftTiempoH);
-    if (mEl) mEl.textContent = pad2t(draftTiempoM);
+    if (hEl) hEl.value = String(draftTiempoH);
+    if (mEl) mEl.value = String(draftTiempoM);
     const totalMin = draftTiempoH * 60 + draftTiempoM;
     if (hint) {
       if (totalMin < 60) hint.textContent = 'Total: ' + totalMin + ' min';
@@ -310,11 +347,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const mins = Number(chip.getAttribute('data-mins'));
       chip.classList.toggle('is-active', mins === totalMin);
     });
+
+    // Aviso en UI si supera el límite de hora
+    const segs = draftTiempoH * 3600 + draftTiempoM * 60;
+    const max = maxSegundosHastaLimite();
+    if (max != null && segs > max) {
+      showLimiteMsg(
+        'Supera el límite de las ' +
+          limiteHora +
+          '. Máximo permitido: ' +
+          formatDuracionHumana(max) +
+          '.'
+      );
+    } else {
+      clearLimiteMsg();
+    }
   }
 
   function openTiempoModal(h, m) {
     draftTiempoH = h || 0;
     draftTiempoM = m || 0;
+    clearLimiteMsg();
     syncTiempoUI();
     openModal(modalTiempo);
   }
@@ -331,21 +384,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return Math.max(0, Math.floor((hasta - Date.now()) / 1000));
   }
 
+  /** Devuelve { segs, capped, max } sin alert() */
   function aplicarTopeLimite(segs) {
     const max = maxSegundosHastaLimite();
-    if (max == null) return segs;
-    if (segs > max) {
-      const m = Math.floor(max / 60);
-      alert(
-        'No puedes asignar más tiempo del disponible hasta el límite (' +
-          limiteHora +
-          '). Máximo: ' +
-          m +
-          ' min.'
-      );
-      return max;
-    }
-    return segs;
+    if (max == null) return { segs, capped: false, max: null };
+    if (segs > max) return { segs: max, capped: true, max };
+    return { segs, capped: false, max };
   }
 
   const btnTHUp = document.getElementById('btnTiempoHoraUp');
@@ -366,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (btnTMUp) {
     btnTMUp.addEventListener('click', () => {
-      draftTiempoM += 5;
+      draftTiempoM += 1;
       if (draftTiempoM >= 60) {
         draftTiempoM = 0;
         draftTiempoH = Math.min(24, draftTiempoH + 1);
@@ -376,11 +420,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (btnTMDown) {
     btnTMDown.addEventListener('click', () => {
-      draftTiempoM -= 5;
+      draftTiempoM -= 1;
       if (draftTiempoM < 0) {
         if (draftTiempoH > 0) {
           draftTiempoH -= 1;
-          draftTiempoM = 55;
+          draftTiempoM = 59;
         } else {
           draftTiempoM = 0;
         }
@@ -388,6 +432,35 @@ document.addEventListener('DOMContentLoaded', () => {
       syncTiempoUI();
     });
   }
+
+  // Escritura manual hora / minutos
+  const inpTH = document.getElementById('tiempoHoraDisplay');
+  const inpTM = document.getElementById('tiempoMinDisplay');
+  if (inpTH) {
+    inpTH.addEventListener('input', () => {
+      let v = parseInt(inpTH.value, 10);
+      if (Number.isNaN(v)) return;
+      draftTiempoH = Math.min(24, Math.max(0, v));
+      syncTiempoUI();
+    });
+    inpTH.addEventListener('change', () => {
+      draftTiempoH = Math.min(24, Math.max(0, parseInt(inpTH.value, 10) || 0));
+      syncTiempoUI();
+    });
+  }
+  if (inpTM) {
+    inpTM.addEventListener('input', () => {
+      let v = parseInt(inpTM.value, 10);
+      if (Number.isNaN(v)) return;
+      draftTiempoM = Math.min(59, Math.max(0, v));
+      syncTiempoUI();
+    });
+    inpTM.addEventListener('change', () => {
+      draftTiempoM = Math.min(59, Math.max(0, parseInt(inpTM.value, 10) || 0));
+      syncTiempoUI();
+    });
+  }
+
   const tiempoPresets = document.getElementById('tiempoPresets');
   if (tiempoPresets) {
     tiempoPresets.addEventListener('click', (e) => {
@@ -407,8 +480,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (currentTiempoAction === 'definido') {
       if (segs <= 0) return;
-      segs = aplicarTopeLimite(segs);
+      const top = aplicarTopeLimite(segs);
+      segs = top.segs;
       if (segs <= 0) return;
+      if (top.capped) {
+        showAppToast(
+          'Se ajustó al límite (' +
+            limiteHora +
+            '): se asignaron ' +
+            formatDuracionHumana(segs) +
+            '.'
+        );
+      }
       eq.estado = 'definido';
       eq.tiempoTotal = segs;
       eq.tiempoTranscurrido = 0;
@@ -426,13 +509,15 @@ document.addEventListener('DOMContentLoaded', () => {
       let nuevoTotal = trans + restanteActual + segs;
       const max = maxSegundosHastaLimite();
       if (max != null) {
-        // No superar lo que cabe hasta la hora límite desde ahora (+ lo ya usado)
         const tope = trans + max;
         if (nuevoTotal > tope) {
-          alert(
-            'No puedes superar el límite de hora (' +
+          const agregado = Math.max(0, tope - (trans + restanteActual));
+          showAppToast(
+            'Se ajustó al límite (' +
               limiteHora +
-              '). Se ajustará al máximo permitido.'
+              '): se agregaron ' +
+              formatDuracionHumana(agregado) +
+              '.'
           );
           nuevoTotal = tope;
         }
@@ -462,8 +547,17 @@ document.addEventListener('DOMContentLoaded', () => {
       // Cambiar el tiempo total de la sesión definida
       if (segs <= 0) return;
       const trans = getTranscurrido(eq);
-      segs = aplicarTopeLimite(segs);
-      // Si el tope es menor que lo usado, al menos respetar lo usado
+      const top = aplicarTopeLimite(segs);
+      segs = top.segs;
+      if (top.capped) {
+        showAppToast(
+          'Se ajustó al límite (' +
+            limiteHora +
+            '): total ' +
+            formatDuracionHumana(Math.max(segs, trans)) +
+            '.'
+        );
+      }
       eq.tiempoTotal = Math.max(segs, trans);
       if (eq.tiempoTotal > trans) eq.alerted = false;
       eq.tiempoTranscurrido = trans;
@@ -474,8 +568,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTiempoAction === 'a-definido') {
       // Libre → Definido conservando progreso
       if (segs <= 0) return;
-      segs = aplicarTopeLimite(segs);
+      const top = aplicarTopeLimite(segs);
+      segs = top.segs;
       if (segs <= 0) return;
+      if (top.capped) {
+        showAppToast(
+          'Se ajustó al límite (' +
+            limiteHora +
+            '): se asignaron ' +
+            formatDuracionHumana(segs) +
+            '.'
+        );
+      }
       const trans = getTranscurrido(eq);
       eq.estado = 'definido';
       eq.tiempoTotal = Math.max(segs, trans);
@@ -572,10 +676,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const hEl = document.getElementById('limiteHoraDisplay');
     const mEl = document.getElementById('limiteMinDisplay');
     const hidden = document.getElementById('inputLimiteHora');
-    if (hEl) hEl.textContent = pad2(draftHora);
-    if (mEl) mEl.textContent = pad2(draftMin);
+    if (hEl) hEl.value = pad2(draftHora);
+    if (mEl) mEl.value = pad2(draftMin);
     if (hidden) hidden.value = pad2(draftHora) + ':' + pad2(draftMin);
-    document.querySelectorAll('.limite-chip').forEach((chip) => {
+    document.querySelectorAll('#limitePresets .limite-chip').forEach((chip) => {
       const v = chip.getAttribute('data-hora');
       chip.classList.toggle('is-active', v === pad2(draftHora) + ':' + pad2(draftMin));
     });
@@ -623,16 +727,39 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnMinUp) {
     btnMinUp.addEventListener('click', (e) => {
       e.stopPropagation();
-      draftMin = (draftMin + 5) % 60;
+      draftMin = (draftMin + 1) % 60;
       syncLimiteUI();
     });
   }
   if (btnMinDown) {
     btnMinDown.addEventListener('click', (e) => {
       e.stopPropagation();
-      draftMin = (draftMin + 55) % 60;
+      draftMin = (draftMin + 59) % 60;
       syncLimiteUI();
     });
+  }
+
+  const limHInp = document.getElementById('limiteHoraDisplay');
+  const limMInp = document.getElementById('limiteMinDisplay');
+  if (limHInp) {
+    limHInp.addEventListener('input', (e) => {
+      e.stopPropagation();
+      let v = parseInt(limHInp.value, 10);
+      if (Number.isNaN(v)) return;
+      draftHora = Math.min(23, Math.max(0, v));
+      syncLimiteUI();
+    });
+    limHInp.addEventListener('click', (e) => e.stopPropagation());
+  }
+  if (limMInp) {
+    limMInp.addEventListener('input', (e) => {
+      e.stopPropagation();
+      let v = parseInt(limMInp.value, 10);
+      if (Number.isNaN(v)) return;
+      draftMin = Math.min(59, Math.max(0, v));
+      syncLimiteUI();
+    });
+    limMInp.addEventListener('click', (e) => e.stopPropagation());
   }
 
   const limitePresets = document.getElementById('limitePresets');
@@ -696,6 +823,21 @@ document.addEventListener('DOMContentLoaded', () => {
     saveState();
     pricePanel.hidden = true;
   });
+
+  function stepInput(id, delta, minV) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const next = Math.max(minV, (Number(el.value) || 0) + delta);
+    el.value = String(next);
+  }
+  const btnPAUp = document.getElementById('btnPriceAmountUp');
+  const btnPADown = document.getElementById('btnPriceAmountDown');
+  const btnPPUp = document.getElementById('btnPricePerUp');
+  const btnPPDown = document.getElementById('btnPricePerDown');
+  if (btnPAUp) btnPAUp.addEventListener('click', (e) => { e.stopPropagation(); stepInput('priceAmount', 1, 0); });
+  if (btnPADown) btnPADown.addEventListener('click', (e) => { e.stopPropagation(); stepInput('priceAmount', -1, 0); });
+  if (btnPPUp) btnPPUp.addEventListener('click', (e) => { e.stopPropagation(); stepInput('pricePer', 1, 1); });
+  if (btnPPDown) btnPPDown.addEventListener('click', (e) => { e.stopPropagation(); stepInput('pricePer', -1, 1); });
 
   document.addEventListener('click', (e) => {
     if (

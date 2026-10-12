@@ -4,37 +4,47 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const NOTIF_VERSION = '2026-10-11-v4';
+  const NOTIF_VERSION = '2026-10-11-v5';
 
   const NOVEDADES = [
     {
       type: 'feature',
-      text: 'Selector de tiempo con atajos (15 min, 30 min, 1–3 h) y botones +/− para horas y minutos.',
+      text: 'Selectores de tiempo editables: escribe la hora/minutos a mano o usa +/− de 1 en 1.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Historial con filtros: búsqueda por nombre/notas, tipo, fecha y rango de monto.',
+      text: 'Aviso de límite de hora en la interfaz (sin alertas del navegador) y toast al ajustar el tiempo máximo.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Tarjetas de estado permanentes: vencidos, en pausa, activos e inactivos (con pulso).',
+      text: 'Mejores controles en precio y cobro: +/− en precio, unidad y monto extra.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Límite de tiempo libre por hora del día (panel de herramientas), sin pedirlo al iniciar.',
+      text: 'Precios redondeados a .00 o .50 (menos de .25 baja; .25–.75 a .50; más de .75 sube).',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Alarma más notoria al vencer el tiempo; restar tiempo también en modo definido.',
+      text: 'Cobro en tiempo definido: monto completo o solo tiempo usado.',
       date: 'Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Ticket de cobro imprimible y deshacer cobro restaurando la sesión (20 s).',
+      text: 'Mover sesión a otro equipo, pasar de libre a definido y ajustar total sin perder progreso.',
+      date: 'Oct 2026'
+    },
+    {
+      type: 'feature',
+      text: 'Tarjetas de estado, filtros de historial, ticket de cobro y deshacer cobro con restauración.',
+      date: 'Oct 2026'
+    },
+    {
+      type: 'feature',
+      text: 'Límite de tiempo libre por hora del día desde herramientas; alarma al vencer.',
       date: 'Oct 2026'
     }
   ];

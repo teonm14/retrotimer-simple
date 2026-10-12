@@ -1560,3 +1560,117 @@
 .cobrar-radio input {
   accent-color: var(--teal-light, #037a8a);
 }
+
+
+/* Inputs editables en steppers */
+.step-input {
+  width: 3rem;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+.step-input::-webkit-outer-spin-button,
+.step-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.step-input:focus {
+  outline: 2px solid #00bcd4;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tiempo-limite-msg {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  background: #3e2723;
+  border: 1px solid #ff8a65;
+  color: #ffccbc;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+.tiempo-limite-msg[hidden] {
+  display: none !important;
+}
+
+.app-toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #1b3a4b;
+  border: 1px solid #4fc3f7;
+  color: #e1f5fe;
+  border-radius: 10px;
+  padding: 0.7rem 1.1rem;
+  z-index: 320;
+  max-width: min(420px, 92vw);
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.app-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.app-toast[hidden] {
+  display: none !important;
+}
+
+.price-fields-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  align-items: stretch;
+}
+.price-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.price-field label {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.price-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.price-stepper .price-input {
+  flex: 1;
+  text-align: center;
+}
+.price-select-v2 {
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #111;
+  color: #fff;
+}
+
+.extra-row-v2 {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.extra-currency {
+  font-weight: 700;
+  opacity: 0.8;
+}
+.extra-input {
+  flex: 1;
+  text-align: center;
+}

@@ -81,9 +81,27 @@ export function computeLimiteHasta(horaStr) {
   return d.getTime();
 }
 
+/**
+ * Redondeo comercial a .00 o .50:
+ * < .25 → entero abajo
+ * .25–.75 → .50
+ * > .75 → siguiente entero
+ */
+export function roundMoney(n) {
+  const x = Number(n) || 0;
+  const sign = x < 0 ? -1 : 1;
+  const abs = Math.abs(x);
+  const intPart = Math.floor(abs + 1e-9);
+  const frac = abs - intPart;
+  if (frac < 0.25) return sign * intPart;
+  if (frac <= 0.75) return sign * (intPart + 0.5);
+  return sign * (intPart + 1);
+}
+
 export function calcularPrecio(segundos) {
   const { amount, per, unit } = priceConfig;
   const perSec = unit === 'horas' ? per * 3600 : per * 60;
   if (perSec <= 0) return 0;
-  return Math.ceil((segundos / perSec) * amount * 100) / 100;
+  const raw = (segundos / perSec) * amount;
+  return roundMoney(raw);
 }

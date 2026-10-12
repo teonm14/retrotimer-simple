@@ -122,14 +122,30 @@
   <div class="price-panel" id="pricePanel" hidden>
     <div class="price-panel-inner">
       <span class="price-label">Ajuste de Precio</span>
-      <div class="price-fields">
-        <input type="number" id="priceAmount" min="0" step="1" value="30" class="price-input">
-        <span>por</span>
-        <input type="number" id="pricePer" min="1" step="1" value="30" class="price-input price-per">
-        <select id="priceUnit" class="price-select">
-          <option value="minutos">MINUTOS</option>
-          <option value="horas">HORAS</option>
-        </select>
+      <div class="price-fields price-fields-v2">
+        <div class="price-field">
+          <label for="priceAmount">Precio ($)</label>
+          <div class="price-stepper">
+            <button type="button" class="limite-step-btn" id="btnPriceAmountDown">−</button>
+            <input type="number" id="priceAmount" min="0" step="1" value="30" class="price-input">
+            <button type="button" class="limite-step-btn" id="btnPriceAmountUp">+</button>
+          </div>
+        </div>
+        <div class="price-field">
+          <label for="pricePer">Cada</label>
+          <div class="price-stepper">
+            <button type="button" class="limite-step-btn" id="btnPricePerDown">−</button>
+            <input type="number" id="pricePer" min="1" step="1" value="30" class="price-input price-per">
+            <button type="button" class="limite-step-btn" id="btnPricePerUp">+</button>
+          </div>
+        </div>
+        <div class="price-field">
+          <label for="priceUnit">Unidad</label>
+          <select id="priceUnit" class="price-select price-select-v2">
+            <option value="minutos">Minutos</option>
+            <option value="horas">Horas</option>
+          </select>
+        </div>
       </div>
       <button class="btn-price-save" id="btnSavePrice">Guardar</button>
     </div>
@@ -152,7 +168,7 @@
         <div class="limite-stepper">
           <button type="button" class="limite-step-btn" id="btnHoraDown" title="Bajar hora">−</button>
           <div class="limite-step-value">
-            <span id="limiteHoraDisplay">22</span>
+            <input type="number" id="limiteHoraDisplay" class="step-input" min="0" max="23" step="1" value="22" inputmode="numeric">
             <small>hora</small>
           </div>
           <button type="button" class="limite-step-btn" id="btnHoraUp" title="Subir hora">+</button>
@@ -161,7 +177,7 @@
         <div class="limite-stepper">
           <button type="button" class="limite-step-btn" id="btnMinDown" title="Bajar minutos">−</button>
           <div class="limite-step-value">
-            <span id="limiteMinDisplay">00</span>
+            <input type="number" id="limiteMinDisplay" class="step-input" min="0" max="59" step="1" value="0" inputmode="numeric">
             <small>min</small>
           </div>
           <button type="button" class="limite-step-btn" id="btnMinUp" title="Subir minutos">+</button>
@@ -253,7 +269,7 @@
           <div class="limite-stepper">
             <button type="button" class="limite-step-btn" id="btnTiempoHoraDown" title="Bajar horas">−</button>
             <div class="limite-step-value">
-              <span id="tiempoHoraDisplay">0</span>
+              <input type="number" id="tiempoHoraDisplay" class="step-input" min="0" max="24" step="1" value="0" inputmode="numeric">
               <small>horas</small>
             </div>
             <button type="button" class="limite-step-btn" id="btnTiempoHoraUp" title="Subir horas">+</button>
@@ -262,13 +278,14 @@
           <div class="limite-stepper">
             <button type="button" class="limite-step-btn" id="btnTiempoMinDown" title="Bajar minutos">−</button>
             <div class="limite-step-value">
-              <span id="tiempoMinDisplay">30</span>
+              <input type="number" id="tiempoMinDisplay" class="step-input" min="0" max="59" step="1" value="30" inputmode="numeric">
               <small>min</small>
             </div>
             <button type="button" class="limite-step-btn" id="btnTiempoMinUp" title="Subir minutos">+</button>
           </div>
         </div>
         <p class="tiempo-total-hint" id="tiempoTotalHint">Total: 30 min</p>
+        <p class="tiempo-limite-msg" id="tiempoLimiteMsg" hidden></p>
       </div>
       <div class="modal-actions">
         <button class="modal-btn modal-btn-cancel" id="btnCancelarTiempo" type="button">Cancelar</button>
@@ -295,9 +312,11 @@
         </div>
         <p class="cobrar-base" id="cobrarBase">Tiempo: $0.00</p>
         <label class="modal-label">Extra (copias, abarrotes, etc.):</label>
-        <div class="extra-row">
-          <span>$</span>
-          <input type="number" id="inputExtra" class="modal-input modal-input-num" min="0" step="0.01" value="0">
+        <div class="extra-row extra-row-v2">
+          <span class="extra-currency">$</span>
+          <button type="button" class="limite-step-btn" id="btnExtraDown" title="Bajar">−</button>
+          <input type="number" id="inputExtra" class="modal-input modal-input-num extra-input" min="0" step="0.5" value="0" inputmode="decimal">
+          <button type="button" class="limite-step-btn" id="btnExtraUp" title="Subir">+</button>
         </div>
         <p class="cobrar-total" id="cobrarTotal">Total a cobrar: $0.00</p>
       </div>
@@ -389,6 +408,8 @@
       </div>
     </div>
   </div>
+
+  <div class="app-toast" id="appToast" hidden role="status" aria-live="polite"></div>
 
   <!-- Toast deshacer cobro -->
   <div class="undo-toast" id="undoToast" hidden role="status" aria-live="polite">
