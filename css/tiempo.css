@@ -1573,11 +1573,11 @@
   border: none;
   color: #fff;
   padding: 0;
-  -moz-appearance: textfield;
+  appearance: textfield;
 }
 .step-input::-webkit-outer-spin-button,
 .step-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 .step-input:focus {
@@ -1673,4 +1673,94 @@
 .extra-input {
   flex: 1;
   text-align: center;
+}
+
+
+/* Filtros de equipos */
+.equipos-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+.equipo-filter-chip {
+  background: #151515;
+  border: 1px solid #333;
+  color: #ccc;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.equipo-filter-chip:hover {
+  border-color: #00bcd4;
+  color: #fff;
+}
+.equipo-filter-chip.is-active {
+  background: var(--teal, #005c69);
+  border-color: var(--teal-light, #037a8a);
+  color: #fff;
+}
+
+/* Historial calculadora */
+.calc-history {
+  max-height: 120px;
+  overflow-y: auto;
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(0,0,0,0.35);
+  border-radius: 8px;
+  border: 1px solid #333;
+  font-size: 0.8rem;
+}
+.calc-history-empty {
+  opacity: 0.5;
+  text-align: center;
+  margin: 0;
+  padding: 0.35rem;
+}
+.calc-history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.08);
+  font-variant-numeric: tabular-nums;
+}
+.calc-history-item:last-child {
+  border-bottom: none;
+}
+.calc-history-expr {
+  opacity: 0.75;
+}
+.calc-history-result {
+  font-weight: 700;
+  color: #80deea;
+  cursor: pointer;
+}
+.calc-history-result:hover {
+  text-decoration: underline;
+}
+.calc-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  opacity: 0.65;
+  letter-spacing: 0.3px;
+}
+.btn-clear-calc-hist {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.72rem;
+  padding: 0;
+}
+.btn-clear-calc-hist:hover {
+  color: #fff;
 }

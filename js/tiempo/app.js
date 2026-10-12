@@ -68,6 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initCobroUI();
   initCalc();
 
+  /* ----- Filtros de equipos ----- */
+  const equiposFilters = document.getElementById('equiposFilters');
+  if (equiposFilters) {
+    equiposFilters.addEventListener('click', (e) => {
+      const chip = e.target.closest('.equipo-filter-chip');
+      if (!chip) return;
+      equiposFilters.querySelectorAll('.equipo-filter-chip').forEach((c) => {
+        c.classList.toggle('is-active', c === chip);
+      });
+      renderEquipos(equiposList);
+    });
+  }
+
   /* ----- Tick ----- */
   setInterval(() => {
     tickOnce();

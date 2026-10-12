@@ -63,6 +63,20 @@ export function renderVencidos(container) {
   renderStatusCards(container);
 }
 
+export function getEquipoFilter() {
+  const active = document.querySelector('.equipo-filter-chip.is-active');
+  return (active && active.dataset.filter) || 'todos';
+}
+
+function matchesEquipoFilter(eq, filter) {
+  if (!filter || filter === 'todos') return true;
+  const t = (eq.tipo || '').toUpperCase();
+  if (filter === 'PC') return t.includes('PC') && !t.includes('XBOX') && !t.includes('PLAY');
+  if (filter === 'XBOX') return t.includes('XBOX');
+  if (filter === 'PLAYSTATION') return t.includes('PLAY');
+  return t.includes(filter.toUpperCase());
+}
+
 export function renderEquipos(equiposList) {
   if (!equiposList) return;
 
@@ -79,7 +93,16 @@ export function renderEquipos(equiposList) {
     return;
   }
 
-  equiposList.innerHTML = equipos
+  const filter = getEquipoFilter();
+  const lista = equipos.filter((eq) => matchesEquipoFilter(eq, filter));
+
+  if (lista.length === 0) {
+    equiposList.innerHTML =
+      '<p class="equipos-empty">No hay equipos de este tipo.</p>';
+    return;
+  }
+
+  equiposList.innerHTML = lista
     .map((eq) => {
       const iName = iconName(eq.tipo);
       const iClass = iconClass(eq.tipo);
