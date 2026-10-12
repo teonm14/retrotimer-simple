@@ -4,48 +4,48 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const NOTIF_VERSION = '2026-10-11-v5';
+  const NOTIF_VERSION = '2026-10-12-v6';
 
   const NOVEDADES = [
     {
       type: 'feature',
-      text: 'Selectores de tiempo editables: escribe la hora/minutos a mano o usa +/− de 1 en 1.',
-      date: 'Oct 2026'
+      text: 'Filtros de equipos por tipo: Todos, PC, Xbox y PlayStation (diseño renovado).',
+      date: '12 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Aviso de límite de hora en la interfaz (sin alertas del navegador) y toast al ajustar el tiempo máximo.',
-      date: 'Oct 2026'
+      text: 'Calculadora con historial a la derecha: solo registra la expresión completa al pulsar =.',
+      date: '12 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Mejores controles en precio y cobro: +/− en precio, unidad y monto extra.',
-      date: 'Oct 2026'
+      text: 'Calculadora usable con teclado y pad numérico (incluye Backspace). Botones C (entrada) y AC (todo).',
+      date: '12 Oct 2026'
+    },
+    {
+      type: 'fix',
+      text: 'Corrección de aviso CSS en selectores de tiempo (appearance).',
+      date: '12 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Precios redondeados a .00 o .50 (menos de .25 baja; .25–.75 a .50; más de .75 sube).',
-      date: 'Oct 2026'
+      text: 'Selectores de tiempo editables (+/− de 1 en 1 y captura manual de hora/minutos).',
+      date: '11 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Cobro en tiempo definido: monto completo o solo tiempo usado.',
-      date: 'Oct 2026'
+      text: 'Aviso de límite de hora en la interfaz y toast al ajustar al máximo permitido.',
+      date: '11 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Mover sesión a otro equipo, pasar de libre a definido y ajustar total sin perder progreso.',
-      date: 'Oct 2026'
+      text: 'Cobro en tiempo definido: monto completo o solo tiempo usado. Precios redondeados a .00 o .50.',
+      date: '11 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Tarjetas de estado, filtros de historial, ticket de cobro y deshacer cobro con restauración.',
-      date: 'Oct 2026'
-    },
-    {
-      type: 'feature',
-      text: 'Límite de tiempo libre por hora del día desde herramientas; alarma al vencer.',
-      date: 'Oct 2026'
+      text: 'Mover sesión entre equipos, pasar de libre a definido y ajustar total sin perder progreso.',
+      date: '11 Oct 2026'
     }
   ];
 
