@@ -1,14 +1,14 @@
-/** Calculadora + historial */
+/** Calculadora + historial (solo al pulsar =) */
 
 const HIST_KEY = 'rc_calc_historial';
-const HIST_MAX = 30;
+const HIST_MAX = 40;
 
 let calcDisplay = null;
 let calcCurrent = '0';
 let calcPrev = null;
 let calcOp = null;
 let calcFresh = true;
-let lastExprLeft = null;
+let keyHandler = null;
 
 function loadHist() {
   try {
@@ -38,10 +38,8 @@ function renderHist() {
   }
   list.innerHTML = items
     .map(
-      (h, i) =>
-        '<div class="calc-history-item" data-idx="' +
-        i +
-        '">' +
+      (h) =>
+        '<div class="calc-history-item">' +
         '<span class="calc-history-expr">' +
         h.expr +
         '</span>' +
@@ -60,6 +58,11 @@ function pushHist(expr, result) {
   items.unshift({ expr, result, ts: Date.now() });
   saveHist(items);
   renderHist();
+}
+
+function isCalcOpen() {
+  const modal = document.getElementById('modalCalc');
+  return modal && !modal.hidden;
 }
 
 export function initCalc() {
@@ -92,6 +95,35 @@ export function initCalc() {
     });
   }
 
+  // Teclado / pad numérico mientras la calculadora esté abierta
+  if (keyHandler) document.removeEventListener('keydown', keyHandler, true);
+  keyHandler = (e) => {
+    if (!isCalcOpen()) return;
+    // no interferir si se escribe en un input (no hay inputs en calc, pero por seguridad)
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+    let k = null;
+    if (e.key >= '0' && e.key <= '9') k = e.key;
+    else if (e.code && e.code.startsWith('Numpad') && e.key >= '0' && e.key <= '9') k = e.key;
+    else if (e.key === '.' || e.key === ',' || e.code === 'NumpadDecimal') k = '.';
+    else if (e.key === '+' || e.code === 'NumpadAdd') k = '+';
+    else if (e.key === '-' || e.code === 'NumpadSubtract') k = '-';
+    else if (e.key === '*' || e.code === 'NumpadMultiply') k = '*';
+    else if (e.key === '/' || e.code === 'NumpadDivide') k = '/';
+    else if (e.key === 'Enter' || e.key === '=' || e.code === 'NumpadEnter') k = '=';
+    else if (e.key === 'Backspace') k = 'Backspace';
+    else if (e.key === 'Escape') k = 'AC';
+    else if (e.key === 'Delete') k = 'C';
+    else if (e.key === '%') k = '%';
+
+    if (!k) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handleKey(k);
+  };
+  document.addEventListener('keydown', keyHandler, true);
+
   renderHist();
 }
 
@@ -99,16 +131,38 @@ function update() {
   if (calcDisplay) calcDisplay.textContent = calcCurrent;
 }
 
+/** AC: borra todo */
 export function calcReset() {
   calcCurrent = '0';
   calcPrev = null;
   calcOp = null;
   calcFresh = true;
-  lastExprLeft = null;
   update();
 }
 
-function compute() {
+/** C: borra solo la entrada actual */
+function clearEntry() {
+  calcCurrent = '0';
+  calcFresh = true;
+  update();
+}
+
+function backspace() {
+  if (calcFresh) return;
+  if (calcCurrent.length <= 1 || (calcCurrent.length === 2 && calcCurrent.charAt(0) === '-')) {
+    calcCurrent = '0';
+    calcFresh = true;
+  } else {
+    calcCurrent = calcCurrent.slice(0, -1);
+  }
+  update();
+}
+
+/**
+ * Calcula el resultado parcial.
+ * @param {boolean} record Si true, guarda en historial (solo al pulsar =)
+ */
+function compute(record) {
   if (calcPrev == null || calcOp == null) return;
   const a = parseFloat(calcPrev);
   const b = parseFloat(calcCurrent);
@@ -118,8 +172,10 @@ function compute() {
   else if (calcOp === '*') r = a * b;
   else if (calcOp === '/') r = b === 0 ? 0 : a / b;
   const result = String(Math.round(r * 1e10) / 1e10);
-  const expr = calcPrev + ' ' + opLabel(calcOp) + ' ' + calcCurrent;
-  pushHist(expr, result);
+  if (record) {
+    const expr = calcPrev + ' ' + opLabel(calcOp) + ' ' + calcCurrent;
+    pushHist(expr, result);
+  }
   calcCurrent = result;
   calcPrev = null;
   calcOp = null;
@@ -148,8 +204,16 @@ function handleKey(k) {
     update();
     return;
   }
-  if (k === 'C') {
+  if (k === 'AC') {
     calcReset();
+    return;
+  }
+  if (k === 'C') {
+    clearEntry();
+    return;
+  }
+  if (k === 'Backspace') {
+    backspace();
     return;
   }
   if (k === '±') {
@@ -165,11 +229,13 @@ function handleKey(k) {
     return;
   }
   if (k === '=') {
-    compute();
+    // Solo aquí se registra en historial
+    compute(true);
     return;
   }
   if ('+-*/'.indexOf(k) !== -1) {
-    if (calcPrev != null && calcOp && !calcFresh) compute();
+    // Operaciones intermedias: calcula sin historial
+    if (calcPrev != null && calcOp && !calcFresh) compute(false);
     calcPrev = calcCurrent;
     calcOp = k;
     calcFresh = true;

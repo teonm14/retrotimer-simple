@@ -213,34 +213,39 @@
   <div class="modal-overlay" id="modalCalc" hidden>
     <div class="modal modal-calc">
       <h3 class="modal-title">Calculadora</h3>
-      <div class="calc-display" id="calcDisplay">0</div>
-      <div class="calc-history" id="calcHistory">
-        <div class="calc-history-header">
-          <span>Historial</span>
-          <button type="button" class="btn-clear-calc-hist" id="btnClearCalcHist">Limpiar</button>
+      <div class="calc-layout">
+        <div class="calc-main">
+          <div class="calc-display" id="calcDisplay">0</div>
+          <div class="calc-grid">
+            <button type="button" class="calc-btn calc-fn" data-calc="AC" title="Borrar todo">AC</button>
+            <button type="button" class="calc-btn calc-fn" data-calc="C" title="Borrar entrada">C</button>
+            <button type="button" class="calc-btn" data-calc="Backspace" title="Borrar dígito">⌫</button>
+            <button type="button" class="calc-btn calc-op" data-calc="/">÷</button>
+            <button type="button" class="calc-btn" data-calc="7">7</button>
+            <button type="button" class="calc-btn" data-calc="8">8</button>
+            <button type="button" class="calc-btn" data-calc="9">9</button>
+            <button type="button" class="calc-btn calc-op" data-calc="*">×</button>
+            <button type="button" class="calc-btn" data-calc="4">4</button>
+            <button type="button" class="calc-btn" data-calc="5">5</button>
+            <button type="button" class="calc-btn" data-calc="6">6</button>
+            <button type="button" class="calc-btn calc-op" data-calc="-">−</button>
+            <button type="button" class="calc-btn" data-calc="1">1</button>
+            <button type="button" class="calc-btn" data-calc="2">2</button>
+            <button type="button" class="calc-btn" data-calc="3">3</button>
+            <button type="button" class="calc-btn calc-op" data-calc="+">+</button>
+            <button type="button" class="calc-btn" data-calc="±">±</button>
+            <button type="button" class="calc-btn" data-calc="0">0</button>
+            <button type="button" class="calc-btn" data-calc=".">.</button>
+            <button type="button" class="calc-btn calc-eq" data-calc="=">=</button>
+          </div>
         </div>
-        <div id="calcHistoryList"></div>
-      </div>
-      <div class="calc-grid">
-        <button type="button" class="calc-btn" data-calc="C">C</button>
-        <button type="button" class="calc-btn" data-calc="±">±</button>
-        <button type="button" class="calc-btn" data-calc="%">%</button>
-        <button type="button" class="calc-btn calc-op" data-calc="/">÷</button>
-        <button type="button" class="calc-btn" data-calc="7">7</button>
-        <button type="button" class="calc-btn" data-calc="8">8</button>
-        <button type="button" class="calc-btn" data-calc="9">9</button>
-        <button type="button" class="calc-btn calc-op" data-calc="*">×</button>
-        <button type="button" class="calc-btn" data-calc="4">4</button>
-        <button type="button" class="calc-btn" data-calc="5">5</button>
-        <button type="button" class="calc-btn" data-calc="6">6</button>
-        <button type="button" class="calc-btn calc-op" data-calc="-">−</button>
-        <button type="button" class="calc-btn" data-calc="1">1</button>
-        <button type="button" class="calc-btn" data-calc="2">2</button>
-        <button type="button" class="calc-btn" data-calc="3">3</button>
-        <button type="button" class="calc-btn calc-op" data-calc="+">+</button>
-        <button type="button" class="calc-btn calc-zero" data-calc="0">0</button>
-        <button type="button" class="calc-btn" data-calc=".">.</button>
-        <button type="button" class="calc-btn calc-eq" data-calc="=">=</button>
+        <aside class="calc-history" id="calcHistory">
+          <div class="calc-history-header">
+            <span>Historial</span>
+            <button type="button" class="btn-clear-calc-hist" id="btnClearCalcHist">Limpiar</button>
+          </div>
+          <div id="calcHistoryList"></div>
+        </aside>
       </div>
       <button class="modal-btn modal-btn-cancel" id="btnCerrarCalc" type="button">Cerrar</button>
     </div>
