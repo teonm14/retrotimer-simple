@@ -1,4 +1,4 @@
-/** Calculadora + historial (solo al pulsar =) */
+/** Calculadora + historial (expresión completa solo al pulsar =) */
 
 const HIST_KEY = 'rc_calc_historial';
 const HIST_MAX = 40;
@@ -8,6 +8,8 @@ let calcCurrent = '0';
 let calcPrev = null;
 let calcOp = null;
 let calcFresh = true;
+/** Tokens de la expresión en curso, ej. ['5', '+', '3', '+'] */
+let exprParts = [];
 let keyHandler = null;
 
 function loadHist() {
@@ -26,6 +28,10 @@ function opLabel(op) {
   if (op === '*') return '×';
   if (op === '/') return '÷';
   return op;
+}
+
+function isOpToken(t) {
+  return t === '+' || t === '-' || t === '×' || t === '÷' || t === '*' || t === '/';
 }
 
 function renderHist() {
@@ -83,6 +89,9 @@ export function initCalc() {
       if (!res) return;
       calcCurrent = res.getAttribute('data-result') || '0';
       calcFresh = true;
+      exprParts = [];
+      calcPrev = null;
+      calcOp = null;
       update();
     });
   }
@@ -95,17 +104,14 @@ export function initCalc() {
     });
   }
 
-  // Teclado / pad numérico mientras la calculadora esté abierta
   if (keyHandler) document.removeEventListener('keydown', keyHandler, true);
   keyHandler = (e) => {
     if (!isCalcOpen()) return;
-    // no interferir si se escribe en un input (no hay inputs en calc, pero por seguridad)
     const tag = (e.target && e.target.tagName) || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA') return;
 
     let k = null;
     if (e.key >= '0' && e.key <= '9') k = e.key;
-    else if (e.code && e.code.startsWith('Numpad') && e.key >= '0' && e.key <= '9') k = e.key;
     else if (e.key === '.' || e.key === ',' || e.code === 'NumpadDecimal') k = '.';
     else if (e.key === '+' || e.code === 'NumpadAdd') k = '+';
     else if (e.key === '-' || e.code === 'NumpadSubtract') k = '-';
@@ -131,16 +137,17 @@ function update() {
   if (calcDisplay) calcDisplay.textContent = calcCurrent;
 }
 
-/** AC: borra todo */
+/** AC: borra todo (entrada, operación pendiente y expresión) */
 export function calcReset() {
   calcCurrent = '0';
   calcPrev = null;
   calcOp = null;
   calcFresh = true;
+  exprParts = [];
   update();
 }
 
-/** C: borra solo la entrada actual */
+/** C: solo borra el número que se está escribiendo (mantiene la operación) */
 function clearEntry() {
   calcCurrent = '0';
   calcFresh = true;
@@ -159,11 +166,11 @@ function backspace() {
 }
 
 /**
- * Calcula el resultado parcial.
- * @param {boolean} record Si true, guarda en historial (solo al pulsar =)
+ * Calcula resultado parcial o final.
+ * NO escribe en historial (el historial se arma en handleKey '=').
  */
-function compute(record) {
-  if (calcPrev == null || calcOp == null) return;
+function computeSilent() {
+  if (calcPrev == null || calcOp == null) return null;
   const a = parseFloat(calcPrev);
   const b = parseFloat(calcCurrent);
   let r = 0;
@@ -172,15 +179,12 @@ function compute(record) {
   else if (calcOp === '*') r = a * b;
   else if (calcOp === '/') r = b === 0 ? 0 : a / b;
   const result = String(Math.round(r * 1e10) / 1e10);
-  if (record) {
-    const expr = calcPrev + ' ' + opLabel(calcOp) + ' ' + calcCurrent;
-    pushHist(expr, result);
-  }
   calcCurrent = result;
   calcPrev = null;
   calcOp = null;
   calcFresh = true;
   update();
+  return result;
 }
 
 function handleKey(k) {
@@ -219,23 +223,56 @@ function handleKey(k) {
   if (k === '±') {
     if (calcCurrent !== '0') {
       calcCurrent = calcCurrent.charAt(0) === '-' ? calcCurrent.slice(1) : '-' + calcCurrent;
+      calcFresh = false;
       update();
     }
     return;
   }
   if (k === '%') {
     calcCurrent = String(parseFloat(calcCurrent) / 100);
+    calcFresh = false;
     update();
     return;
   }
+
   if (k === '=') {
-    // Solo aquí se registra en historial
-    compute(true);
+    if (calcPrev == null || calcOp == null) return;
+    // Completar expresión con el operando actual
+    exprParts.push(calcCurrent);
+    const fullExpr = exprParts.join(' ');
+    const result = computeSilent();
+    if (result != null) {
+      pushHist(fullExpr, result);
+    }
+    exprParts = [];
     return;
   }
+
   if ('+-*/'.indexOf(k) !== -1) {
-    // Operaciones intermedias: calcula sin historial
-    if (calcPrev != null && calcOp && !calcFresh) compute(false);
+    const label = opLabel(k);
+
+    // Cambiar operador antes de escribir el siguiente número
+    if (calcFresh && calcOp != null && calcPrev != null) {
+      calcOp = k;
+      if (exprParts.length && isOpToken(exprParts[exprParts.length - 1])) {
+        exprParts[exprParts.length - 1] = label;
+      }
+      return;
+    }
+
+    // Cadena: 5 + 3 + … → calcula intermedio SIN historial
+    if (calcPrev != null && calcOp != null && !calcFresh) {
+      exprParts.push(calcCurrent);
+      computeSilent();
+      exprParts.push(label);
+      calcPrev = calcCurrent;
+      calcOp = k;
+      calcFresh = true;
+      return;
+    }
+
+    // Primera operación de la expresión
+    exprParts = [calcCurrent, label];
     calcPrev = calcCurrent;
     calcOp = k;
     calcFresh = true;
