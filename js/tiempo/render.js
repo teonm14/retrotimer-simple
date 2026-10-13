@@ -43,10 +43,14 @@ function statusCard(key, icon, label, count, pulse) {
     key +
     (pulse ? ' is-pulse' : '') +
     hasItems +
+    '" role="status" aria-label="' +
+    label +
+    ': ' +
+    count +
     '">' +
     '<ion-icon name="' +
     icon +
-    '" class="status-card-icon"></ion-icon>' +
+    '" class="status-card-icon" aria-hidden="true"></ion-icon>' +
     '<div class="status-card-body">' +
     '<span class="status-card-count">' +
     count +
@@ -123,7 +127,7 @@ export function renderEquipos(equiposList) {
         return (
           '<div class="' +
           rowClass +
-          '" data-id="' +
+          '" role="listitem" data-id="' +
           eq.id +
           '">' +
           '<div class="equipo-row-top">' +
@@ -159,7 +163,7 @@ export function renderEquipos(equiposList) {
         return (
           '<div class="' +
           rowClass +
-          '" data-id="' +
+          '" role="listitem" data-id="' +
           eq.id +
           '">' +
           '<div class="equipo-row-top">' +
@@ -227,7 +231,7 @@ export function renderEquipos(equiposList) {
         return (
           '<div class="' +
           rowClass +
-          '" data-id="' +
+          '" role="listitem" data-id="' +
           eq.id +
           '">' +
           '<div class="equipo-row-top">' +

@@ -10,13 +10,15 @@
   <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
   <div class="app">
     <header class="header">
       <h1 class="logo">RetroControl</h1>
       <div class="header-actions">
-        <button class="btn-header-icon" id="btnNotif" title="Novedades" type="button">
-          <ion-icon name="notifications-outline"></ion-icon>
-          <span class="notif-dot" id="notifDot"></span>
+        <button class="btn-header-icon" id="btnNotif" type="button"
+          aria-label="Novedades y notificaciones" aria-expanded="false" aria-controls="notifPanel" title="Novedades">
+          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+          <span class="notif-dot" id="notifDot" aria-hidden="true"></span>
         </button>
       </div>
     </header>
@@ -25,27 +27,28 @@
       <aside class="sidebar">
         <nav class="nav">
           <a href="../index.html" class="nav-btn">Inicio</a>
-          <a href="tiempo.html" class="nav-btn active">Gestión Tiempo</a>
+          <a href="tiempo.html" class="nav-btn active" aria-current="page">Gestión Tiempo</a>
         </nav>
         <div class="sidebar-footer">
-          <button type="button" class="nav-btn nav-btn-about" id="btnAbout">
-            <ion-icon name="information-circle-outline"></ion-icon>
+          <button type="button" class="nav-btn nav-btn-about" id="btnAbout" aria-haspopup="dialog">
+            <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon>
             Acerca de
           </button>
         </div>
       </aside>
 
-      <main class="content">
+      <main class="content" id="main-content" tabindex="-1">
         <div class="page-header">
           <h2 class="page-title">Gestión de Tiempo</h2>
-          <button type="button" class="btn-toggle-historial" id="btnToggleHistorial" title="Mostrar/ocultar historial">
-            <ion-icon name="time-outline"></ion-icon>
+          <button type="button" class="btn-toggle-historial" id="btnToggleHistorial"
+            title="Mostrar/ocultar historial" aria-expanded="true" aria-controls="historialSidebar">
+            <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
             <span id="toggleHistorialLabel">Historial</span>
           </button>
         </div>
 
         <!-- Tarjetas de estado (permanentes) -->
-        <div class="status-cards" id="vencidosBanner"></div>
+        <div class="status-cards" id="vencidosBanner" role="region" aria-label="Resumen de equipos"></div>
 
         <div class="equipos-header">
           <span class="equipos-title">Equipos</span>
@@ -54,19 +57,19 @@
           </button>
         </div>
         <div class="equipos-filters" id="equiposFilters" role="group" aria-label="Filtrar equipos">
-          <button type="button" class="equipo-filter-chip is-active" data-filter="todos">Todos</button>
-          <button type="button" class="equipo-filter-chip" data-filter="PC">PC</button>
-          <button type="button" class="equipo-filter-chip" data-filter="XBOX">Xbox</button>
-          <button type="button" class="equipo-filter-chip" data-filter="PLAYSTATION">PlayStation</button>
+          <button type="button" class="equipo-filter-chip is-active" data-filter="todos" aria-pressed="true">Todos</button>
+          <button type="button" class="equipo-filter-chip" data-filter="PC" aria-pressed="false">PC</button>
+          <button type="button" class="equipo-filter-chip" data-filter="XBOX" aria-pressed="false">Xbox</button>
+          <button type="button" class="equipo-filter-chip" data-filter="PLAYSTATION" aria-pressed="false">PlayStation</button>
         </div>
-        <div class="equipos-list" id="equiposList"></div>
+        <div class="equipos-list" id="equiposList" role="list" aria-label="Lista de equipos"></div>
 
         <p class="keyboard-hints" aria-hidden="true">
           Atajos: <kbd>N</kbd> nuevo equipo · <kbd>C</kbd> cobrar (vencido/activo) · <kbd>Enter</kbd> confirmar
         </p>
       </main>
 
-      <aside class="historial-sidebar" id="historialSidebar">
+      <aside class="historial-sidebar" id="historialSidebar" aria-label="Historial de cobros">
         <div class="historial-header">
           <span class="historial-title">
             <ion-icon name="time-outline"></ion-icon> Historial
@@ -106,11 +109,12 @@
     </div>
   </div>
 
-  <button class="fab-config" id="fabConfig" title="Herramientas">
-    <ion-icon name="settings-outline"></ion-icon>
+  <button class="fab-config" id="fabConfig" type="button" title="Herramientas"
+    aria-label="Abrir herramientas" aria-expanded="false" aria-haspopup="menu" aria-controls="toolsMenu">
+    <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
   </button>
 
-  <div class="tools-menu" id="toolsMenu" hidden>
+  <div class="tools-menu" id="toolsMenu" role="menu" hidden>
     <button class="tools-menu-item" id="btnMenuPrecio" type="button">
       <ion-icon name="cash-outline"></ion-icon>
       <span>Ajustar precio</span>
@@ -199,7 +203,7 @@
   </div>
 
   <!-- Notificaciones -->
-  <div class="notif-panel" id="notifPanel" hidden>
+  <div class="notif-panel" id="notifPanel" role="region" aria-label="Novedades" hidden>
     <div class="notif-panel-header">
       <span>Novedades</span>
       <button type="button" class="btn-clear-historial" id="btnCloseNotif" title="Cerrar">
@@ -210,9 +214,9 @@
   </div>
 
   <!-- Calculadora -->
-  <div class="modal-overlay" id="modalCalc" hidden>
+  <div class="modal-overlay" id="modalCalc" hidden role="dialog" aria-modal="true" aria-labelledby="calcTitle">
     <div class="modal modal-calc">
-      <h3 class="modal-title">Calculadora</h3>
+      <h3 class="modal-title" id="calcTitle">Calculadora</h3>
       <div class="calc-layout">
         <div class="calc-main">
           <div class="calc-display" id="calcDisplay">0</div>
@@ -252,7 +256,7 @@
   </div>
 
   <!-- Nuevo / Editar equipo -->
-  <div class="modal-overlay" id="modalNuevoEquipo" hidden>
+  <div class="modal-overlay" id="modalNuevoEquipo" hidden role="dialog" aria-modal="true" aria-labelledby="modalEquipoTitle">
     <div class="modal">
       <h3 class="modal-title" id="modalEquipoTitle">Nuevo Equipo</h3>
       <div class="modal-body">
@@ -272,7 +276,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalTiempo" hidden>
+  <div class="modal-overlay" id="modalTiempo" hidden role="dialog" aria-modal="true" aria-labelledby="modalTiempoTitle">
     <div class="modal modal-tiempo">
       <h3 class="modal-title" id="modalTiempoTitle">Tiempo Definido</h3>
       <div class="modal-body">
@@ -312,9 +316,9 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalCobrar" hidden>
+  <div class="modal-overlay" id="modalCobrar" hidden role="dialog" aria-modal="true" aria-labelledby="modalCobrarTitle">
     <div class="modal modal-cobrar">
-      <h3 class="modal-title">Cobrar</h3>
+      <h3 class="modal-title" id="modalCobrarTitle">Cobrar</h3>
       <div class="modal-body">
         <p class="cobrar-info" id="cobrarInfo">Tiempo utilizado: 00:00:00</p>
         <div class="cobrar-modo-wrap" id="cobrarModoWrap" hidden>
@@ -362,7 +366,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalConfirm" hidden>
+  <div class="modal-overlay" id="modalConfirm" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
     <div class="modal">
       <h3 class="modal-title" id="confirmTitle">¿Estás seguro?</h3>
       <div class="modal-body">
@@ -376,9 +380,9 @@
   </div>
 
   <!-- About -->
-  <div class="modal-overlay" id="modalAbout" hidden>
+  <div class="modal-overlay" id="modalAbout" hidden role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
     <div class="modal modal-about">
-      <h3 class="modal-title">Acerca de RetroControl</h3>
+      <h3 class="modal-title" id="aboutTitle">Acerca de RetroControl</h3>
       <div class="modal-body about-body">
         <div class="about-brand">
           <span class="about-logo">RetroControl</span>
@@ -407,7 +411,7 @@
   </div>
 
   <!-- Ticket de cobro -->
-  <div class="modal-overlay" id="modalTicket" hidden>
+  <div class="modal-overlay" id="modalTicket" hidden role="dialog" aria-modal="true" aria-label="Ticket de cobro">
     <div class="modal modal-ticket" id="ticketPrintArea">
       <h3 class="modal-title">Ticket de cobro</h3>
       <div class="ticket-body">

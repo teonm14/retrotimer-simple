@@ -75,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const chip = e.target.closest('.equipo-filter-chip');
       if (!chip) return;
       equiposFilters.querySelectorAll('.equipo-filter-chip').forEach((c) => {
-        c.classList.toggle('is-active', c === chip);
+        const on = c === chip;
+        c.classList.toggle('is-active', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       renderEquipos(equiposList);
     });
@@ -636,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pricePanel) pricePanel.hidden = true;
     const limPanel = document.getElementById('limitePanel');
     if (limPanel) limPanel.hidden = true;
+    if (fabConfig) fabConfig.setAttribute('aria-expanded', 'false');
   }
 
   function loadPriceUI() {
@@ -650,6 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (toolsMenu.hidden) {
         pricePanel.hidden = true;
         toolsMenu.hidden = false;
+        fabConfig.setAttribute('aria-expanded', 'true');
       } else {
         closeTools();
       }
@@ -892,8 +896,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function setHistorialVisible(visible) {
     const sidebar = document.getElementById('historialSidebar');
     const label = document.getElementById('toggleHistorialLabel');
+    const toggleBtn = document.getElementById('btnToggleHistorial');
     if (sidebar) sidebar.classList.toggle('is-hidden', !visible);
     if (label) label.textContent = visible ? 'Ocultar' : 'Historial';
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', visible ? 'true' : 'false');
     localStorage.setItem('rc_historial_visible', visible ? '1' : '0');
   }
 

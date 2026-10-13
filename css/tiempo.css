@@ -814,7 +814,6 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-
 /* ----- Tools menu (FAB) ----- */
 .tools-menu {
   position: fixed;
@@ -1019,7 +1018,6 @@
     margin-left: 0;
     justify-content: flex-start;
   }
-
 
   .price-panel,
   .tools-menu {
@@ -1265,7 +1263,6 @@
   }
 }
 
-
 /* ----- Tarjetas de estado (permanentes) ----- */
 .status-cards {
   margin-bottom: 0.9rem;
@@ -1397,7 +1394,6 @@
   }
 }
 
-
 /* ----- Selector de hora límite ----- */
 .limite-presets {
   display: flex;
@@ -1489,7 +1485,6 @@
   padding-bottom: 0.4rem;
 }
 
-
 /* ----- Filtros historial ----- */
 .historial-filters {
   padding: 0.5rem 0.55rem;
@@ -1542,7 +1537,6 @@
   margin-bottom: 0.55rem;
 }
 
-
 .btn-ajustar,
 .btn-a-definido {
   background: #37474f;
@@ -1561,7 +1555,6 @@
   border-color: #00bcd4;
   color: #00bcd4;
 }
-
 
 .cobrar-modo-wrap {
   display: flex;
@@ -1585,7 +1578,6 @@
 .cobrar-radio input {
   accent-color: var(--teal-light, #037a8a);
 }
-
 
 /* Inputs editables en steppers */
 .step-input {
@@ -1700,7 +1692,6 @@
   text-align: center;
 }
 
-
 /* Filtros de equipos */
 .equipos-filters {
   display: flex;
@@ -1806,7 +1797,6 @@
   color: #fff;
 }
 
-
 @media (max-width: 560px) {
   .calc-layout {
     flex-direction: column;
@@ -1815,4 +1805,146 @@
     width: 100%;
     max-height: 120px;
   }
+}
+
+/* ========== UX / a11y refinements (2026-10-12) ========== */
+
+/* Progress bar more readable */
+.progress-wrap {
+  height: 38px;
+  border: 1px solid var(--border, #2e2e32);
+  background: #0a0a0c;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #166534, #22c55e 70%, #4ade80);
+}
+
+.equipo-row.is-vencido .progress-bar {
+  background: linear-gradient(90deg, #991b1b, #ef4444 70%, #f87171);
+}
+
+.progress-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Equipo cards */
+.equipo-row {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.equipo-row:focus-within {
+  border-color: rgba(6, 182, 212, 0.45);
+  box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.2);
+}
+
+/* Status cards polish */
+.status-card {
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.status-card.has-items {
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25);
+}
+
+.status-card--vencidos.has-items {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.status-card--pausa.has-items {
+  border-color: rgba(234, 179, 8, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-card.is-pulse,
+  .status-card--pausa.is-pulse {
+    animation: none !important;
+  }
+}
+
+/* Historial filters contrast */
+.hist-filter-input,
+.hist-filter-select {
+  border-color: var(--border, #2e2e32);
+  background: var(--bg, #0c0c0e);
+  color: var(--text, #fafafa);
+}
+
+.hist-filter-input:focus-visible,
+.hist-filter-select:focus-visible {
+  outline: 2px solid var(--accent, #06b6d4);
+  outline-offset: 1px;
+}
+
+/* FAB accessible size */
+.fab-config {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Tools menu as menu */
+.tools-menu-item {
+  width: 100%;
+  text-align: left;
+}
+
+.tools-menu-item:focus-visible {
+  outline: 2px solid var(--accent, #06b6d4);
+  outline-offset: 2px;
+}
+
+/* Touch targets min 44px where practical */
+.btn-header-icon {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.btn-accion {
+  min-height: 36px;
+}
+
+@media (max-width: 700px) {
+  .btn-accion {
+    min-height: 40px;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Empty state */
+.equipos-empty {
+  border: 1px dashed var(--border, #2e2e32);
+  border-radius: var(--radius, 12px);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.equipos-empty ion-icon {
+  color: var(--accent, #06b6d4);
+  opacity: 0.55;
+}
+
+/* Badge contrast */
+.badge-vencido {
+  background: var(--danger-soft, rgba(239, 68, 68, 0.15));
+  color: #fca5a5;
+  font-weight: 700;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Toast more visible */
+.app-toast,
+.undo-toast {
+  box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.5));
+  border: 1px solid var(--border, #2e2e32);
+}
+
+/* Notif panel focus trap visual */
+.notif-panel:focus-within {
+  border-color: rgba(6, 182, 212, 0.4);
 }

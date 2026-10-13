@@ -83,12 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function openNotif() {
     if (!notifPanel) return;
     notifPanel.hidden = false;
+    if (btnNotif) btnNotif.setAttribute('aria-expanded', 'true');
     if (notifDot) notifDot.classList.remove('visible');
     localStorage.setItem('rc_notif_seen', NOTIF_VERSION);
   }
 
   function closeNotif() {
     if (notifPanel) notifPanel.hidden = true;
+    if (btnNotif) btnNotif.setAttribute('aria-expanded', 'false');
   }
 
   if (btnNotif) {

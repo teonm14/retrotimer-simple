@@ -9,13 +9,15 @@
   <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
   <div class="app">
     <header class="header">
       <h1 class="logo">RetroControl</h1>
       <div class="header-actions">
-        <button class="btn-header-icon" id="btnNotif" title="Novedades" type="button">
-          <ion-icon name="notifications-outline"></ion-icon>
-          <span class="notif-dot" id="notifDot"></span>
+        <button class="btn-header-icon" id="btnNotif" type="button"
+          aria-label="Novedades y notificaciones" aria-expanded="false" aria-controls="notifPanel" title="Novedades">
+          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+          <span class="notif-dot" id="notifDot" aria-hidden="true"></span>
         </button>
       </div>
     </header>
@@ -23,7 +25,7 @@
     <div class="main-container">
       <aside class="sidebar">
         <nav class="nav">
-          <a href="index.html" class="nav-btn active">Inicio</a>
+          <a href="index.html" class="nav-btn active" aria-current="page">Inicio</a>
           <a href="pages/tiempo.html" class="nav-btn">Gestión Tiempo</a>
         </nav>
         <div class="sidebar-footer">
@@ -34,7 +36,7 @@
         </div>
       </aside>
 
-      <main class="content">
+      <main class="content" id="main-content" tabindex="-1">
         <h2 class="page-title page-title-home">Inicio</h2>
         <h2 class="welcome-title">Gestiona el tiempo de tus equipos</h2>
 
@@ -53,7 +55,7 @@
     </div>
   </div>
 
-  <div class="notif-panel" id="notifPanel" hidden>
+  <div class="notif-panel" id="notifPanel" role="region" aria-label="Novedades" hidden>
     <div class="notif-panel-header">
       <span>Novedades</span>
       <button type="button" class="btn-header-icon" id="btnCloseNotif" title="Cerrar">
@@ -63,9 +65,9 @@
     <div class="notif-list" id="notifList"></div>
   </div>
 
-  <div class="modal-overlay" id="modalAbout" hidden>
+  <div class="modal-overlay" id="modalAbout" hidden role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
     <div class="modal modal-about">
-      <h3 class="modal-title">Acerca de RetroControl</h3>
+      <h3 class="modal-title" id="aboutTitle">Acerca de RetroControl</h3>
       <div class="modal-body about-body">
         <div class="about-brand">
           <span class="about-logo">RetroControl</span>
