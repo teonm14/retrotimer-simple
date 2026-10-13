@@ -7,6 +7,17 @@
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('rc_theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+        else document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Saltar al contenido</a>
@@ -14,6 +25,11 @@
     <header class="header">
       <h1 class="logo">RetroControl</h1>
       <div class="header-actions">
+        <button class="btn-header-icon theme-toggle" id="btnTheme" type="button"
+          aria-label="Cambiar tema claro u oscuro" title="Tema">
+          <ion-icon class="icon-moon" name="moon-outline" aria-hidden="true"></ion-icon>
+          <ion-icon class="icon-sun" name="sunny-outline" aria-hidden="true"></ion-icon>
+        </button>
         <button class="btn-header-icon" id="btnNotif" type="button"
           aria-label="Novedades y notificaciones" aria-expanded="false" aria-controls="notifPanel" title="Novedades">
           <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>

@@ -146,4 +146,40 @@ document.addEventListener('DOMContentLoaded', () => {
       if (feedbackThanks) feedbackThanks.hidden = false;
     });
   }
+
+  /* ----- Tema claro / oscuro ----- */
+  const THEME_KEY = 'rc_theme';
+  const btnTheme = document.getElementById('btnTheme');
+
+  function getTheme() {
+    const t = document.documentElement.getAttribute('data-theme');
+    return t === 'light' ? 'light' : 'dark';
+  }
+
+  function applyTheme(theme) {
+    const next = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (e) {}
+    if (btnTheme) {
+      btnTheme.setAttribute(
+        'aria-label',
+        next === 'light' ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro'
+      );
+      btnTheme.title = next === 'light' ? 'Tema oscuro' : 'Tema claro';
+    }
+  }
+
+  // Sincronizar UI del botón con el tema ya aplicado (script en <head>)
+  applyTheme(getTheme());
+
+  if (btnTheme) {
+    btnTheme.addEventListener('click', function (e) {
+      e.stopPropagation();
+      applyTheme(getTheme() === 'light' ? 'dark' : 'light');
+    });
+  }
+
+
 });

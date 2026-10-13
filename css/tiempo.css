@@ -1948,3 +1948,243 @@
 .notif-panel:focus-within {
   border-color: rgba(6, 182, 212, 0.4);
 }
+
+
+/* ========== Tema claro — superficies de tiempo.css ========== */
+[data-theme="light"] .historial-sidebar {
+  background-color: var(--surface, #fff);
+  border-left-color: var(--border-subtle, #e4e4e7);
+}
+
+[data-theme="light"] .historial-header {
+  border-bottom-color: var(--border-subtle, #e4e4e7);
+}
+
+[data-theme="light"] .historial-item {
+  background: var(--surface-2, #fafafa);
+  border-color: var(--border-subtle, #e4e4e7);
+}
+
+[data-theme="light"] .equipos-header {
+  background-color: var(--surface-2, #fafafa);
+  border-color: var(--border, #d4d4d8);
+}
+
+[data-theme="light"] .equipos-list {
+  background-color: var(--surface, #fff);
+  border-color: var(--border, #d4d4d8);
+}
+
+[data-theme="light"] .equipo-row {
+  background-color: var(--surface-2, #fafafa);
+  border-color: var(--border-subtle, #e4e4e7);
+}
+
+[data-theme="light"] .equipo-row.is-paused {
+  background: rgba(228, 228, 231, 0.7);
+  border-color: var(--text-muted, #71717a);
+}
+
+[data-theme="light"] .equipo-row.is-vencido {
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme="light"] .notas-input {
+  background: var(--bg, #f4f4f5);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .progress-wrap {
+  background: #e4e4e7;
+  border-color: var(--border, #d4d4d8);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .progress-text {
+  text-shadow: none;
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .progress-bar {
+  background: linear-gradient(90deg, #15803d, #22c55e 70%, #4ade80);
+}
+
+[data-theme="light"] .equipo-row.is-paused .progress-bar {
+  background: linear-gradient(90deg, #a1a1aa, #d4d4d8);
+}
+
+[data-theme="light"] .equipo-row.is-vencido .progress-bar {
+  background: linear-gradient(90deg, #b91c1c, #ef4444 70%, #f87171);
+}
+
+[data-theme="light"] .price-panel-inner,
+[data-theme="light"] .tools-menu-item,
+[data-theme="light"] .limite-panel-inner {
+  background: var(--surface, #fff);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+  box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.12));
+}
+
+[data-theme="light"] .price-input,
+[data-theme="light"] .price-select {
+  background: var(--bg, #f4f4f5);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .modal {
+  background: var(--surface, #fff);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .modal-overlay {
+  background: rgba(24, 24, 27, 0.4);
+}
+
+[data-theme="light"] .modal-input,
+[data-theme="light"] .modal-select,
+[data-theme="light"] .modal-textarea {
+  background: var(--bg, #f4f4f5);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .calc-display {
+  background: var(--bg, #f4f4f5);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .calc-btn {
+  background: var(--surface-3, #e4e4e7);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .calc-btn:hover {
+  background: var(--border, #d4d4d8);
+}
+
+[data-theme="light"] .calc-history {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--border, #d4d4d8);
+}
+
+[data-theme="light"] .calc-history-result {
+  color: var(--accent, #0891b2);
+}
+
+[data-theme="light"] .status-card {
+  background: var(--surface, #fff);
+  border-color: var(--border, #d4d4d8);
+}
+
+[data-theme="light"] .status-card--vencidos {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+[data-theme="light"] .status-card--vencidos.has-items {
+  border-color: #ef4444;
+  background: #fee2e2;
+}
+
+[data-theme="light"] .status-card--pausa {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+[data-theme="light"] .status-card--pausa.has-items {
+  border-color: #eab308;
+  background: #fef9c3;
+}
+
+[data-theme="light"] .status-card--activos {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+[data-theme="light"] .status-card--inactivos {
+  border-color: var(--border, #d4d4d8);
+  background: var(--surface-2, #fafafa);
+}
+
+[data-theme="light"] .equipos-filters {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--border, #d4d4d8);
+}
+
+[data-theme="light"] .equipo-filter-chip {
+  background: var(--surface, #fff);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text-secondary, #52525b);
+}
+
+[data-theme="light"] .equipo-filter-chip:hover {
+  background: var(--surface-2, #fafafa);
+  color: var(--text, #18181b);
+  border-color: var(--accent, #0891b2);
+}
+
+[data-theme="light"] .equipo-filter-chip.is-active {
+  background: linear-gradient(135deg, #0e7490, #0891b2);
+  border-color: #22d3ee;
+  color: #fff;
+}
+
+[data-theme="light"] .hist-filter-input,
+[data-theme="light"] .hist-filter-select {
+  background: var(--bg, #f4f4f5);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+}
+
+[data-theme="light"] .app-toast,
+[data-theme="light"] .undo-toast {
+  background: var(--surface, #fff);
+  border-color: var(--border, #d4d4d8);
+  color: var(--text, #18181b);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="light"] .badge-paused {
+  background: var(--warning-soft);
+  color: #a16207;
+}
+
+[data-theme="light"] .badge-mode {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+[data-theme="light"] .badge-vencido {
+  background: var(--danger-soft);
+  color: #b91c1c;
+}
+
+[data-theme="light"] .btn-pause {
+  background: var(--surface-3);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+[data-theme="light"] .btn-eliminar,
+[data-theme="light"] .btn-cancelar,
+[data-theme="light"] .btn-editar {
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .ticket-body {
+  color: var(--text);
+}
+
+[data-theme="light"] .equipos-empty {
+  border-color: var(--border);
+  background: rgba(0, 0, 0, 0.02);
+  color: var(--text-muted);
+}
