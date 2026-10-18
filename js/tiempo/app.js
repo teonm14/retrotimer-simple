@@ -938,6 +938,19 @@ document.addEventListener('DOMContentLoaded', () => {
     btnHideHistorial.addEventListener('click', () => setHistorialVisible(false));
   }
 
+  const btnMobileHistorial = document.getElementById('btnMobileHistorial');
+  if (btnMobileHistorial) {
+    btnMobileHistorial.addEventListener('click', () => {
+      const sidebar = document.getElementById('historialSidebar');
+      const open = sidebar && !sidebar.classList.contains('is-hidden');
+      setHistorialVisible(!open);
+    });
+  }
+  const historialBackdrop = document.getElementById('historialBackdrop');
+  if (historialBackdrop) {
+    historialBackdrop.addEventListener('click', () => setHistorialVisible(false));
+  }
+
   if (btnClearHistorial) {
     btnClearHistorial.addEventListener('click', () => {
       confirmCallback = () => {

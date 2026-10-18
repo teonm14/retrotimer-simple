@@ -4,47 +4,37 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const NOTIF_VERSION = '2026-10-12-v7';
+  const NOTIF_VERSION = '2026-10-17-v8';
 
   const NOVEDADES = [
     {
       type: 'feature',
-      text: 'Tema claro y oscuro: interruptor junto a las notificaciones. Se guarda tu preferencia.',
-      date: '12 Oct 2026'
+      text: 'Vista móvil independiente: barra inferior (Inicio, Tiempo, Historial, Acerca) sin afectar la vista de PC.',
+      date: '17 Oct 2026'
+    },
+    {
+      type: 'feature',
+      text: 'Historial en móvil como panel a pantalla completa; el botón del header se oculta para evitar duplicados.',
+      date: '17 Oct 2026'
     },
     {
       type: 'fix',
-      text: 'Tema claro: scrollbars, botón mover sesión, steppers/chips de tiempo y menú de herramientas.',
-      date: '12 Oct 2026'
-    },
-    {
-      type: 'fix',
-      text: 'Tarjetas de estado con más contraste en tema claro (vencidos, pausa, activos).',
-      date: '12 Oct 2026'
+      text: 'Tarjetas de equipo más compactas en móvil (menos espacio vacío en el temporizador).',
+      date: '17 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Mejoras de accesibilidad: skip-link, ARIA en modales y controles, focus visible.',
+      text: 'Tema claro y oscuro con preferencia guardada.',
       date: '12 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Filtros de equipos por tipo: Todos, PC, Xbox y PlayStation.',
+      text: 'Filtros de equipos, calculadora con historial, selectores de tiempo editables.',
       date: '12 Oct 2026'
     },
     {
       type: 'feature',
-      text: 'Calculadora con historial, teclado numérico, C y AC.',
-      date: '12 Oct 2026'
-    },
-    {
-      type: 'feature',
-      text: 'Selectores de tiempo editables (+/− y captura manual de hora/minutos).',
-      date: '11 Oct 2026'
-    },
-    {
-      type: 'feature',
-      text: 'Mover sesión entre equipos, cobro flexible y precios redondeados a .00 o .50.',
+      text: 'Cobro flexible, mover sesión, precios redondeados a .00 o .50.',
       date: '11 Oct 2026'
     }
   ];

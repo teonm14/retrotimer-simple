@@ -162,7 +162,7 @@
 }
 
 [data-layout="mobile"] .btn-toggle-historial {
-  margin-left: auto;
+  display: none !important;
 }
 
 [data-layout="mobile"] .status-cards-grid {
