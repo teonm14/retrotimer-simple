@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RetroControl - Inicio</title>
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/mobile.css">
   <script type="module" src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
   <script>
@@ -15,6 +16,15 @@
         else document.documentElement.setAttribute('data-theme', 'dark');
       } catch (e) {
         document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      // Layout móvil/escritorio (antes del paint)
+      try {
+        var force = localStorage.getItem('rc_layout_force');
+        var mobile = force === 'mobile' || (!force && window.matchMedia('(max-width: 820px)').matches);
+        if (force === 'desktop') mobile = false;
+        document.documentElement.setAttribute('data-layout', mobile ? 'mobile' : 'desktop');
+      } catch (e2) {
+        document.documentElement.setAttribute('data-layout', 'desktop');
       }
     })();
   </script>
@@ -69,6 +79,21 @@
         </div>
       </main>
     </div>
+
+    <nav class="mobile-bottom-nav" aria-label="Navegación principal">
+      <a href="index.html" class="mobile-nav-item active" aria-current="page">
+        <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
+        <span>Inicio</span>
+      </a>
+      <a href="pages/tiempo.html" class="mobile-nav-item">
+        <ion-icon name="timer-outline" aria-hidden="true"></ion-icon>
+        <span>Tiempo</span>
+      </a>
+      <button type="button" class="mobile-nav-item" id="btnMobileAbout" aria-haspopup="dialog">
+        <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon>
+        <span>Acerca</span>
+      </button>
+    </nav>
   </div>
 
   <div class="notif-panel" id="notifPanel" role="region" aria-label="Novedades" hidden>
@@ -110,6 +135,7 @@
     </div>
   </div>
 
+  <script src="js/layout.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

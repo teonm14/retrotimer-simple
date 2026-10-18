@@ -181,5 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* Navegación móvil: Acerca de */
+  document.querySelectorAll('#btnMobileAbout').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var aboutBtn = document.getElementById('btnAbout');
+      if (aboutBtn) aboutBtn.click();
+      else if (modalAbout) {
+        modalAbout.hidden = false;
+      }
+    });
+  });
 
 });

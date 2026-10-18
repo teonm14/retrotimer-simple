@@ -897,14 +897,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('historialSidebar');
     const label = document.getElementById('toggleHistorialLabel');
     const toggleBtn = document.getElementById('btnToggleHistorial');
-    if (sidebar) sidebar.classList.toggle('is-hidden', !visible);
+    const backdrop = document.getElementById('historialBackdrop');
+    const mobileHistBtn = document.getElementById('btnMobileHistorial');
+    if (sidebar) {
+      sidebar.classList.toggle('is-hidden', !visible);
+      sidebar.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    }
     if (label) label.textContent = visible ? 'Ocultar' : 'Historial';
     if (toggleBtn) toggleBtn.setAttribute('aria-expanded', visible ? 'true' : 'false');
+    if (backdrop) {
+      backdrop.hidden = !visible;
+      backdrop.classList.toggle('is-visible', !!visible);
+    }
+    if (mobileHistBtn) mobileHistBtn.classList.toggle('active', !!visible);
     localStorage.setItem('rc_historial_visible', visible ? '1' : '0');
   }
 
   const histPref = localStorage.getItem('rc_historial_visible');
-  setHistorialVisible(histPref !== '0');
+  const isMobileLayout =
+    document.documentElement.getAttribute('data-layout') === 'mobile' ||
+    (window.RCLayout && window.RCLayout.isMobile && window.RCLayout.isMobile());
+  // En móvil el historial es panel a pantalla completa: cerrado por defecto
+  if (isMobileLayout) {
+    setHistorialVisible(histPref === '1');
+  } else {
+    setHistorialVisible(histPref !== '0');
+  }
 
   const btnToggleHistorial = document.getElementById('btnToggleHistorial');
   if (btnToggleHistorial) {

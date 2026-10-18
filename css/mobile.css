@@ -1,0 +1,346 @@
+/* =========================================================
+   RetroControl — Vista MÓVIL independiente
+   Solo aplica con html[data-layout="mobile"]
+   La vista de escritorio no se ve afectada.
+   ========================================================= */
+
+/* ----- Shell general ----- */
+[data-layout="mobile"] body {
+  overflow: hidden;
+}
+
+[data-layout="mobile"] .app {
+  height: 100dvh;
+  height: 100vh;
+}
+
+[data-layout="mobile"] .header {
+  padding: 0.55rem 0.85rem;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+[data-layout="mobile"] .logo {
+  font-size: 1.05rem;
+}
+
+[data-layout="mobile"] .main-container {
+  flex-direction: column;
+  position: relative;
+  /* espacio para bottom nav */
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Sidebar de escritorio oculto en móvil */
+[data-layout="mobile"] .sidebar {
+  display: none !important;
+}
+
+[data-layout="mobile"] .content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.85rem 0.85rem 1.25rem;
+  padding-bottom: 5.5rem;
+}
+
+[data-layout="mobile"] .keyboard-hints {
+  display: none !important;
+}
+
+/* ----- Bottom navigation ----- */
+.mobile-bottom-nav {
+  display: none;
+}
+
+[data-layout="mobile"] .mobile-bottom-nav {
+  display: flex;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  height: calc(60px + env(safe-area-inset-bottom, 0px));
+  padding: 0.35rem 0.5rem env(safe-area-inset-bottom, 0px);
+  background: var(--header-bg, #141416);
+  border-top: 1px solid var(--border-subtle, #2a2a2a);
+  justify-content: space-around;
+  align-items: stretch;
+  gap: 0.25rem;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.25);
+}
+
+[data-layout="mobile"] .mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #9ca3af);
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0.25rem 0.2rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+[data-layout="mobile"] .mobile-nav-item ion-icon {
+  font-size: 1.35rem;
+}
+
+[data-layout="mobile"] .mobile-nav-item.active,
+[data-layout="mobile"] .mobile-nav-item[aria-current="page"] {
+  color: var(--accent, #22d3ee);
+  background: rgba(34, 211, 238, 0.1);
+}
+
+[data-layout="mobile"] .mobile-nav-item:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ----- Inicio ----- */
+[data-layout="mobile"] .page-title-home,
+[data-layout="mobile"] .welcome-title {
+  text-align: center;
+}
+
+[data-layout="mobile"] .welcome-title {
+  font-size: 1.15rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.35;
+}
+
+[data-layout="mobile"] .cards {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 0 0.25rem;
+}
+
+[data-layout="mobile"] .card {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: 110px;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 16px;
+}
+
+[data-layout="mobile"] .card-icon {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+[data-layout="mobile"] .card-label {
+  font-size: 1.05rem;
+  text-align: left;
+}
+
+/* ----- Gestión de tiempo: header y status ----- */
+[data-layout="mobile"] .page-header {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+[data-layout="mobile"] .page-title {
+  font-size: 1.2rem;
+  margin-bottom: 0;
+}
+
+[data-layout="mobile"] .btn-toggle-historial {
+  margin-left: auto;
+}
+
+[data-layout="mobile"] .status-cards-grid {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.45rem;
+}
+
+[data-layout="mobile"] .status-card {
+  padding: 0.55rem 0.6rem;
+  min-height: 0;
+}
+
+[data-layout="mobile"] .status-card-count {
+  font-size: 1.25rem;
+}
+
+[data-layout="mobile"] .status-card-label {
+  font-size: 0.72rem;
+}
+
+/* Filtros equipos */
+[data-layout="mobile"] .equipos-filters {
+  gap: 0.35rem;
+  padding: 0.3rem;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+[data-layout="mobile"] .equipo-filter-chip {
+  flex-shrink: 0;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+}
+
+[data-layout="mobile"] .equipos-header {
+  margin-bottom: 0.5rem;
+}
+
+[data-layout="mobile"] .btn-add {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Filas de equipo: más touch-friendly */
+[data-layout="mobile"] .equipo-row {
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+[data-layout="mobile"] .equipo-row-top {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+[data-layout="mobile"] .acciones-activas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+[data-layout="mobile"] .btn-accion {
+  min-height: 40px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+[data-layout="mobile"] .notas-input {
+  font-size: 0.9rem;
+  min-height: 2.2rem;
+}
+
+/* ----- Historial: panel a pantalla casi completa ----- */
+[data-layout="mobile"] .historial-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  width: 100% !important;
+  max-width: none !important;
+  z-index: 45;
+  border-left: none;
+  border-radius: 0;
+  transform: translateY(105%);
+  transition: transform 0.28s ease;
+  box-shadow: none;
+}
+
+[data-layout="mobile"] .historial-sidebar:not(.is-hidden) {
+  transform: translateY(0);
+}
+
+[data-layout="mobile"] .historial-sidebar.is-hidden {
+  transform: translateY(105%);
+  pointer-events: none;
+}
+
+[data-layout="mobile"] .historial-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 44;
+}
+
+[data-layout="mobile"] .historial-backdrop.is-visible {
+  display: block;
+}
+
+/* ----- FAB y herramientas ----- */
+[data-layout="mobile"] .fab-config {
+  right: 1rem;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  width: 52px;
+  height: 52px;
+}
+
+[data-layout="mobile"] .tools-menu {
+  right: 1rem;
+  bottom: calc(136px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ----- Modales a ancho casi completo ----- */
+[data-layout="mobile"] .modal {
+  width: calc(100vw - 1.5rem);
+  max-width: 420px;
+  max-height: min(88dvh, 88vh);
+  overflow-y: auto;
+}
+
+[data-layout="mobile"] .modal-calc {
+  max-width: min(520px, calc(100vw - 1rem));
+  width: calc(100vw - 1rem);
+}
+
+[data-layout="mobile"] .calc-layout {
+  flex-direction: column;
+}
+
+[data-layout="mobile"] .calc-history {
+  width: 100%;
+  max-height: 110px;
+}
+
+[data-layout="mobile"] .notif-panel {
+  left: 0.5rem;
+  right: 0.5rem;
+  width: auto;
+  max-width: none;
+}
+
+[data-layout="mobile"] .price-panel,
+[data-layout="mobile"] .limite-panel {
+  left: 0.75rem;
+  right: 0.75rem;
+  width: auto;
+  max-width: none;
+}
+
+/* Toast más centrado arriba del nav */
+[data-layout="mobile"] .app-toast,
+[data-layout="mobile"] #undoToast {
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Desktop: asegurar que el nav móvil no aparezca */
+[data-layout="desktop"] .mobile-bottom-nav,
+html:not([data-layout="mobile"]) .mobile-bottom-nav {
+  display: none !important;
+}
+
+[data-layout="desktop"] .historial-backdrop,
+html:not([data-layout="mobile"]) .historial-backdrop {
+  display: none !important;
+}
