@@ -348,3 +348,32 @@ html:not([data-layout="mobile"]) .mobile-bottom-nav {
 html:not([data-layout="mobile"]) .historial-backdrop {
   display: none !important;
 }
+
+
+/* Compactar espacio del temporizador en móvil */
+[data-layout="mobile"] .tiempo-info {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: 100%;
+  align-self: stretch;
+}
+
+[data-layout="mobile"] .progress-wrap {
+  height: 34px !important;
+  min-width: 0 !important;
+  width: 100%;
+}
+
+[data-layout="mobile"] .equipo-row {
+  gap: 0.45rem !important;
+  padding: 0.7rem 0.8rem !important;
+}
+
+[data-layout="mobile"] .equipo-row-top {
+  gap: 0.5rem !important;
+}
+
+[data-layout="mobile"] .equipo-notas-row {
+  margin-top: 0.15rem;
+}
